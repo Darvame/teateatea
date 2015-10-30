@@ -22,38 +22,38 @@ static void metatable_tostring(lua_State *l, int obj)
 	}
 }
 
-static int pack_kv_call(lua_State *l, char trim)
+static int pack_kv_call(lua_State *l, char flag)
 {
 	int argc = lua_gettop(l);
 
-	size_t len;
-	size_t eql;
+	size_t len = 0;
+	size_t eql = 0;
 	size_t spl = 0;
 
-	if (utable(l, 1)) {
-		metatable_tostring(l, -argc);
-	}
-
-	const char *str = lua_tolstring(l, 1, &len);
-	const char *eq;
+	const char *eq = NULL;
 	const char *sp = NULL;
+	const char *str = NULL;
 
-	if (argc > 1) {
-		eq = lua_tolstring(l, 2, &eql);
+	char ignore = 0;
 
-		if (argc > 2) {
-			sp = lua_tolstring(l, 3, &spl);
-		}
+	switch (argc <= 4 ? argc : 4) {
+		case 4: ignore = lua_toboolean(l, 4) ? TEA_PACK_FLAG_IGNORE_EMPTY : 0;
+		case 3: sp = lua_tolstring(l, 3, &spl);
+		case 2: eq = lua_tolstring(l, 2, &eql);
+		case 1:
+			if (utable(l, 1)) {
+				metatable_tostring(l, -argc);
+			}
 
-		return tea_pack_kv(l, str, len, eq, eql, sp, spl, trim);
+			str = lua_tolstring(l, 1, &len);
 	}
 
-	return tea_pack_kv(l, str, len, NULL, 0, NULL, 0, trim);
+	return tea_pack_kv(l, flag | ignore, str, len, eq, eql, sp, spl);
 }
 
 static int pack_mtkv(lua_State *l)
 {
-	return pack_kv_call(l, TEA_PACK_FLAG_SPACE_TRIM + TEA_PACK_FLAG_MULTI);
+	return pack_kv_call(l, TEA_PACK_FLAG_SPACE_TRIM | TEA_PACK_FLAG_MULTI);
 }
 
 static int pack_tkv(lua_State *l)
@@ -76,28 +76,31 @@ static int pack_call(lua_State *l, char flag)
 {
 	int argc = lua_gettop(l);
 
-	size_t len;
-	size_t spl;
+	size_t len = 0;
+	size_t spl = 0;
 
-	if (utable(l, 1)) {
-		metatable_tostring(l, -argc);
+	const char *str = NULL;
+	const char *sp = NULL;
+
+	char ignore = 0;
+
+	switch (argc <= 3 ? argc : 3) {
+		case 3: ignore = lua_toboolean(l, 3) ? TEA_PACK_FLAG_IGNORE_EMPTY : 0;
+		case 2: sp = lua_tolstring(l, 2, &spl);
+		case 1:
+			if (utable(l, 1)) {
+				metatable_tostring(l, -argc);
+			}
+
+			str = lua_tolstring(l, 1, &len);
 	}
 
-	const char *str = lua_tolstring(l, 1, &len);
-	const char *sp;
-
-	if (argc > 1) {
-		sp = lua_tolstring(l, 2, &spl);
-
-		return tea_pack(l, str, len, sp, spl, flag);
-	}
-
-	return tea_pack(l, str, len, NULL, 0, flag);
+	return tea_pack(l, flag | ignore, str, len, sp, spl);
 }
 
 static int pack_mt(lua_State *l)
 {
-	return pack_call(l, TEA_PACK_FLAG_SPACE_TRIM + TEA_PACK_FLAG_MULTI);
+	return pack_call(l, TEA_PACK_FLAG_SPACE_TRIM | TEA_PACK_FLAG_MULTI);
 }
 
 static int pack_t(lua_State *l)

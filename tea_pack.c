@@ -5,7 +5,7 @@
 static const char pack_eq_default[] = {TEA_PACK_EQ_DEFAULT};
 static const char pack_sp_default[] = {TEA_PACK_SP_DEFAULT};
 
-static int pack_kv_char(struct tea_tcursor_kv *tab, const char *str, size_t len, const char eq, const char sp, char trim)
+static int pack_kv_char(struct tea_tcursor_kv *tab, char flag, const char *str, size_t len, const char eq, const char sp)
 {
 	size_t key_begin;
 	size_t key_end;
@@ -13,7 +13,10 @@ static int pack_kv_char(struct tea_tcursor_kv *tab, const char *str, size_t len,
 	size_t value_end;
 	size_t i;
 
-	for(i = 0; i < len;){
+	char ignore = flag & TEA_PACK_FLAG_IGNORE_EMPTY;
+	char trim = flag & TEA_PACK_FLAG_SPACE_TRIM;
+
+	for(i = 0; i < len;) {
 		// key: begin
 		key_begin = i;
 
@@ -32,13 +35,15 @@ static int pack_kv_char(struct tea_tcursor_kv *tab, const char *str, size_t len,
 			TEA_PACK_SPACE_TRIM_WORD(str, value_begin, value_end);
 		}
 
-		if (tea_tcursor_kv_add(tab, &str[key_begin], key_end - key_begin, &str[value_begin], value_end - value_begin)) return -1;
+		if (tea_tcursor_kv_add(tab, ignore, &str[key_begin], key_end - key_begin, &str[value_begin], value_end - value_begin)) {
+			return -1;
+		}
 	}
 
 	return 0;
 }
 
-static int pack_kv_key(struct tea_tcursor_kv *tab, const char *str, size_t len, const char *eq, size_t eql, const char *sp, size_t spl, char trim)
+static int pack_kv_key(struct tea_tcursor_kv *tab, char flag, const char *str, size_t len, const char *eq, size_t eql, const char *sp, size_t spl)
 {
 	size_t key_begin;
 	size_t key_end;
@@ -47,7 +52,10 @@ static int pack_kv_key(struct tea_tcursor_kv *tab, const char *str, size_t len, 
 	size_t match;
 	size_t i;
 
-	for(i = 0; i < len;){
+	char ignore = flag & TEA_PACK_FLAG_IGNORE_EMPTY;
+	char trim = flag & TEA_PACK_FLAG_SPACE_TRIM;
+
+	for(i = 0; i < len;) {
 		// key: begin
 		key_begin = i;
 
@@ -66,13 +74,15 @@ static int pack_kv_key(struct tea_tcursor_kv *tab, const char *str, size_t len, 
 			TEA_PACK_SPACE_TRIM_WORD(str, value_begin, value_end);
 		}
 
-		if (tea_tcursor_kv_add(tab, &str[key_begin], key_end - key_begin, &str[value_begin], value_end - value_begin)) return -1;
+		if (tea_tcursor_kv_add(tab, ignore, &str[key_begin], key_end - key_begin, &str[value_begin], value_end - value_begin)) {
+			return -1;
+		}
 	}
 
 	return 0;
 }
 
-static int pack_kv_multi(struct tea_tcursor_kv *tab, const char *str, size_t len, const char *eq, size_t eql, const char *sp, size_t spl, char trim)
+static int pack_kv_multi(struct tea_tcursor_kv *tab, char flag, const char *str, size_t len, const char *eq, size_t eql, const char *sp, size_t spl)
 {
 	char sp_dict[TEA_PACK_MULTI_DICT_SIZE] = {};
 	char eq_dict[TEA_PACK_MULTI_DICT_SIZE] = {};
@@ -86,7 +96,10 @@ static int pack_kv_multi(struct tea_tcursor_kv *tab, const char *str, size_t len
 	TEA_PACK_MULTI_DICT_INIT(sp_dict, i, sp, spl);
 	TEA_PACK_MULTI_DICT_INIT(eq_dict, i, eq, eql);
 
-	for(i = 0; i < len;){
+	char ignore = flag & TEA_PACK_FLAG_IGNORE_EMPTY;
+	char trim = flag & TEA_PACK_FLAG_SPACE_TRIM;
+
+	for(i = 0; i < len;) {
 		// key: begin
 		key_begin = i;
 
@@ -105,30 +118,31 @@ static int pack_kv_multi(struct tea_tcursor_kv *tab, const char *str, size_t len
 			TEA_PACK_SPACE_TRIM_WORD(str, value_begin, value_end);
 		}
 
-		if (tea_tcursor_kv_add(tab, &str[key_begin], key_end - key_begin, &str[value_begin], value_end - value_begin)) return -1;
+		if (tea_tcursor_kv_add(tab, ignore, &str[key_begin], key_end - key_begin, &str[value_begin], value_end - value_begin)) {
+			return -1;
+		}
 	}
 
 	return 0;
 }
 
-int tea_pack_kv(lua_State *l, const char *str, size_t len, const char *eq, size_t eql, const char *sp, size_t spl, char flag)
+int tea_pack_kv(lua_State *l, char flag, const char *str, size_t len, const char *eq, size_t eql, const char *sp, size_t spl)
 {
 	struct tea_tcursor_kv tab = {};
 	int stat;
 
 	if(eql < 2 && spl < 2) {
-		stat = pack_kv_char(&tab, str, len,
+		stat = pack_kv_char(&tab, flag, str, len,
 			eql > 0 ? eq[0] : TEA_PACK_EQ_DEFAULT,
-			spl > 0 ? sp[0] : TEA_PACK_SP_DEFAULT,
-			flag & TEA_PACK_FLAG_SPACE_TRIM);
+			spl > 0 ? sp[0] : TEA_PACK_SP_DEFAULT);
 	} else {
 		if(!eql) { eq = pack_eq_default; eql = 1; }
 		if(!spl) { sp = pack_sp_default; spl = 1; }
 
 		if (flag & TEA_PACK_FLAG_MULTI) {
-			stat = pack_kv_multi(&tab, str, len, eq, eql, sp, spl, flag & TEA_PACK_FLAG_SPACE_TRIM);
+			stat = pack_kv_multi(&tab, flag, str, len, eq, eql, sp, spl);
 		} else {
-			stat = pack_kv_key(&tab, str, len, eq, eql, sp, spl, flag & TEA_PACK_FLAG_SPACE_TRIM);
+			stat = pack_kv_key(&tab, flag, str, len, eq, eql, sp, spl);
 		}
 	}
 
@@ -142,13 +156,16 @@ int tea_pack_kv(lua_State *l, const char *str, size_t len, const char *eq, size_
 }
 
 
-static int pack_char(struct tea_tcursor *tab, const char *str, size_t len, const char sp, char trim)
+static int pack_char(struct tea_tcursor *tab, char flag, const char *str, size_t len, const char sp)
 {
 	size_t value_begin;
 	size_t value_end;
 	size_t i;
 
-	for(i = 0; i < len;){
+	char ignore = flag & TEA_PACK_FLAG_IGNORE_EMPTY;
+	char trim = flag & TEA_PACK_FLAG_SPACE_TRIM;
+
+	for(i = 0; i < len;) {
 		// value: begin
 		value_begin = i;
 
@@ -160,20 +177,25 @@ static int pack_char(struct tea_tcursor *tab, const char *str, size_t len, const
 			TEA_PACK_SPACE_TRIM_WORD(str, value_begin, value_end);
 		}
 
-		if (tea_tcursor_add(tab, &str[value_begin], value_end - value_begin)) return -1;
+		if (tea_tcursor_add(tab, ignore, &str[value_begin], value_end - value_begin)) {
+			return -1;
+		}
 	}
 
 	return 0;
 }
 
-static int pack_key(struct tea_tcursor *tab, const char *str, size_t len, const char *sp, size_t spl, char trim)
+static int pack_key(struct tea_tcursor *tab, char flag, const char *str, size_t len, const char *sp, size_t spl)
 {
 	size_t value_begin;
 	size_t value_end;
 	size_t match;
 	size_t i;
 
-	for(i = 0; i < len;){
+	char ignore = flag & TEA_PACK_FLAG_IGNORE_EMPTY;
+	char trim = flag & TEA_PACK_FLAG_SPACE_TRIM;
+
+	for(i = 0; i < len;) {
 		// value: begin
 		value_begin = i;
 
@@ -185,13 +207,15 @@ static int pack_key(struct tea_tcursor *tab, const char *str, size_t len, const 
 			TEA_PACK_SPACE_TRIM_WORD(str, value_begin, value_end);
 		}
 
-		if (tea_tcursor_add(tab, &str[value_begin], value_end - value_begin)) return -1;
+		if (tea_tcursor_add(tab, ignore, &str[value_begin], value_end - value_begin)) {
+			return -1;
+		}
 	}
 
 	return 0;
 }
 
-static int pack_multi(struct tea_tcursor *tab, const char *str, size_t len, const char *sp, size_t spl, char trim)
+static int pack_multi(struct tea_tcursor *tab, char flag, const char *str, size_t len, const char *sp, size_t spl)
 {
 	char sp_dict[TEA_PACK_MULTI_DICT_SIZE] = {};
 
@@ -201,7 +225,10 @@ static int pack_multi(struct tea_tcursor *tab, const char *str, size_t len, cons
 
 	TEA_PACK_MULTI_DICT_INIT(sp_dict, i, sp, spl);
 
-	for(i = 0; i < len;){
+	char ignore = flag & TEA_PACK_FLAG_IGNORE_EMPTY;
+	char trim = flag & TEA_PACK_FLAG_SPACE_TRIM;
+
+	for(i = 0; i < len;) {
 		// value: begin
 		value_begin = i;
 
@@ -213,28 +240,28 @@ static int pack_multi(struct tea_tcursor *tab, const char *str, size_t len, cons
 			TEA_PACK_SPACE_TRIM_WORD(str, value_begin, value_end);
 		}
 
-		if (tea_tcursor_add(tab, &str[value_begin], value_end - value_begin)) return -1;
+		if (tea_tcursor_add(tab, ignore, &str[value_begin], value_end - value_begin)) {
+			return -1;
+		}
 	}
 
 	return 0;
 }
 
-int tea_pack(lua_State *l, const char *str, size_t len, const char *sp, size_t spl, char flag)
+int tea_pack(lua_State *l, char flag, const char *str, size_t len, const char *sp, size_t spl)
 {
 	struct tea_tcursor tab = {};
 	int stat;
 
 	if(spl < 2) {
-		stat = pack_char(&tab, str, len,
-			spl > 0 ? sp[0] : TEA_PACK_SP_DEFAULT,
-			flag & TEA_PACK_FLAG_SPACE_TRIM);
+		stat = pack_char(&tab, flag, str, len, spl > 0 ? sp[0] : TEA_PACK_SP_DEFAULT);
 	} else {
 		if(!spl) { sp = pack_sp_default; spl = 1; }
 
 		if (flag & TEA_PACK_FLAG_MULTI) {
-			stat = pack_multi(&tab, str, len, sp, spl, flag & TEA_PACK_FLAG_SPACE_TRIM);
+			stat = pack_multi(&tab, flag, str, len, sp, spl);
 		} else {
-			stat = pack_key(&tab, str, len, sp, spl, flag & TEA_PACK_FLAG_SPACE_TRIM);
+			stat = pack_key(&tab, flag, str, len, sp, spl);
 		}
 	}
 

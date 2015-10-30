@@ -2,6 +2,7 @@
 
 #define TEA_PACK_FLAG_SPACE_TRIM 0x1
 #define TEA_PACK_FLAG_MULTI 0x2
+#define TEA_PACK_FLAG_IGNORE_EMPTY 0x4
 
 #define TEA_PACK_MULTI_DICT_SIZE 128
 
@@ -89,5 +90,5 @@
 	TEA_PACK_WHILE_ISSPACE(e > b, s[e-1], --e);
 
 
-int tea_pack_kv(lua_State *, const char *, size_t, const char *, size_t, const char *, size_t, char);
-int tea_pack(lua_State *, const char *, size_t, const char *, size_t, char);
+int tea_pack_kv(lua_State *, char, const char *, size_t, const char *, size_t, const char *, size_t);
+int tea_pack(lua_State *, char, const char *, size_t, const char *, size_t);

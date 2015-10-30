@@ -17,7 +17,7 @@ struct tea_tcursor{
 	struct tea_tcursor_part *current;
 };
 
-int tea_tcursor_add(struct tea_tcursor *, const char *, size_t);
+int tea_tcursor_add(struct tea_tcursor *, char, const char *, size_t);
 void tea_tcursor_dump(lua_State *L, struct tea_tcursor *);
 
 struct tea_tcursor_kv_part {
@@ -36,5 +36,5 @@ struct tea_tcursor_kv {
 	struct tea_tcursor_kv_part *current;
 };
 
-int tea_tcursor_kv_add(struct tea_tcursor_kv *, const char *, size_t, const char *, size_t);
+int tea_tcursor_kv_add(struct tea_tcursor_kv *, char, const char *, size_t, const char *, size_t);
 void tea_tcursor_kv_dump(lua_State *L, struct tea_tcursor_kv *);

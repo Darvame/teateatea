@@ -3,9 +3,9 @@
 #include "stdlib.h"
 #include "tea_tcursor.h"
 
-int tea_tcursor_add(struct tea_tcursor *cursor, const char *value, size_t vlen)
+int tea_tcursor_add(struct tea_tcursor *cursor, char ignore, const char *value, size_t vlen)
 {
-	if (!vlen) return 0;
+	if (!vlen && ignore) return 0;
 
 	struct tea_tcursor_part *current = cursor->current;
 
@@ -58,9 +58,9 @@ void tea_tcursor_dump(lua_State *L, struct tea_tcursor *cursor)
 	cursor->parts = 0;
 }
 
-int tea_tcursor_kv_add(struct tea_tcursor_kv *cursor, const char *key, size_t klen, const char *value, size_t vlen)
+int tea_tcursor_kv_add(struct tea_tcursor_kv *cursor, char ignore, const char *key, size_t klen, const char *value, size_t vlen)
 {
-	if (!klen || !vlen) return 0;
+	if (!klen || (!vlen && ignore)) return 0;
 
 	struct tea_tcursor_kv_part *current = cursor->current;
 
