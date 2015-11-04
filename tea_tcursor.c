@@ -3,13 +3,20 @@
 #include "stdlib.h"
 #include "tea_tcursor.h"
 
-int tea_tcursor_add(struct tea_tcursor *cursor, char ignore, const char *value, size_t vlen)
+int tea_tcursor_add(struct tea_tcursor *cursor, const char *value, size_t vlen)
 {
-	if (!vlen && ignore) return 0;
+	if (cursor->size < TEA_TCURSOR_INITITAL) {
+		cursor->value[cursor->size] = value;
+		cursor->vlen[cursor->size] = vlen;
+
+		++cursor->size;
+
+		return 0;
+	}
 
 	struct tea_tcursor_part *current = cursor->current;
 
-	if (!cursor->size || current->used >= TEA_TCURSOR_WORKLOAD) {
+	if (!cursor->parts || current->used >= TEA_TCURSOR_WORKLOAD) {
 		current = (struct tea_tcursor_part*) malloc(sizeof(struct tea_tcursor_part));
 		if (current == NULL) return -1;
 		current->used = 0;
@@ -39,8 +46,12 @@ void tea_tcursor_dump(lua_State *L, struct tea_tcursor *cursor)
 
 	lua_createtable(L, cursor->size, 0);
 
-	size_t i,j;
-	size_t count = 0;
+	size_t i, j, count;
+
+	for (count = 0, i = cursor->size > TEA_TCURSOR_INITITAL ? TEA_TCURSOR_INITITAL : cursor->size; i > 0; --i) {
+		lua_pushlstring(L, cursor->value[count], cursor->vlen[count]);
+		lua_rawseti(L, -2, ++count);
+	}
 
 	for (i = 0; i < cursor->parts; ++i) {
 
@@ -58,13 +69,25 @@ void tea_tcursor_dump(lua_State *L, struct tea_tcursor *cursor)
 	cursor->parts = 0;
 }
 
-int tea_tcursor_kv_add(struct tea_tcursor_kv *cursor, char ignore, const char *key, size_t klen, const char *value, size_t vlen)
+int tea_tcursor_kv_add(struct tea_tcursor_kv *cursor, const char *key, size_t klen, const char *value, size_t vlen)
 {
-	if (!klen || (!vlen && ignore)) return 0;
+	if (!klen) return 0;
+
+	if (cursor->size < TEA_TCURSOR_KV_INITIAL) {
+		cursor->key[cursor->size] = key;
+		cursor->klen[cursor->size] = klen;
+
+		cursor->value[cursor->size] = value;
+		cursor->vlen[cursor->size] = vlen;
+
+		++cursor->size;
+
+		return 0;
+	}
 
 	struct tea_tcursor_kv_part *current = cursor->current;
 
-	if (!cursor->size || current->used >= TEA_TCURSOR_KV_WORKLOAD) {
+	if (!cursor->parts || current->used >= TEA_TCURSOR_KV_WORKLOAD) {
 		current = (struct tea_tcursor_kv_part*) malloc(sizeof(struct tea_tcursor_kv_part));
 		if (current == NULL) return -1;
 		current->used = 0;
@@ -97,7 +120,13 @@ void tea_tcursor_kv_dump(lua_State *L, struct tea_tcursor_kv *cursor)
 
 	lua_createtable(L, 0, cursor->size);
 
-	size_t i,j;
+	size_t i, j;
+
+	for (j = 0, i = cursor->size > TEA_TCURSOR_INITITAL ? TEA_TCURSOR_INITITAL : cursor->size; j < i; ++j) {
+		lua_pushlstring(L, cursor->key[j], cursor->klen[j]);
+		lua_pushlstring(L, cursor->value[j], cursor->vlen[j]);
+		lua_rawset(L, -3);
+	}
 
 	for (i = 0; i < cursor->parts; ++i) {
 

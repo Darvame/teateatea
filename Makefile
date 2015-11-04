@@ -2,16 +2,22 @@ SRC=tea_tcursor.c tea_pack.c teateatea.c
 TARGET=teateatea.so
 TESTFILE=test.lua
 
-PREFIX?=/usr/local
-LUALIBDIR?=$(PREFIX)/lib/lua/5.1
-LUAINC?=-I$(PREFIX)/include/luajit-2.0
-LUA?=$(PREFIX)/bin/luajit
+ifdef LUAPKG
+	PREFIX=$(shell pkg-config --variable=prefix $(LUAPKG))
+	LUALIBDIR=$(shell pkg-config --variable=INSTALL_CMOD $(LUAPKG))
+	LUAINC=$(shell pkg-config --cflags $(LUAPKG))
+	LUA=$(LUAPKG)
+else
+	PREFIX?=/usr/local
+	LUALIBDIR?=$(PREFIX)/lib/lua/5.1
+	LUAINC?=-I$(PREFIX)/include/luajit-2.0
+	LUA?=$(PREFIX)/bin/luajit
+endif
 
-CCOPT=-O2 -Wall -fPIC $(CFLAGS) $(LUAINC)
+CCOPT=-O3 -Wall -fPIC $(CFLAGS) $(LUAINC)
 LDOPT=-shared $(LDFLAGS)
 OBJ=$(SRC:.c=.o)
 CHMOD=755
-CC?=gcc
 
 ifeq ($(CC), clang)
 	LDOPT+= -undefined dynamic_lookup

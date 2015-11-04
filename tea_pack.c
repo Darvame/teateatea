@@ -13,7 +13,7 @@ static int pack_kv_char(struct tea_tcursor_kv *tab, char flag, const char *str, 
 	size_t value_end;
 	size_t i;
 
-	char ignore = flag & TEA_PACK_FLAG_IGNORE_EMPTY;
+	char empty = !(flag & TEA_PACK_FLAG_IGNORE_EMPTY);
 	char trim = flag & TEA_PACK_FLAG_SPACE_TRIM;
 
 	for(i = 0; i < len;) {
@@ -35,8 +35,12 @@ static int pack_kv_char(struct tea_tcursor_kv *tab, char flag, const char *str, 
 			TEA_PACK_SPACE_TRIM_WORD(str, value_begin, value_end);
 		}
 
-		if (tea_tcursor_kv_add(tab, ignore, &str[key_begin], key_end - key_begin, &str[value_begin], value_end - value_begin)) {
-			return -1;
+		value_end -= value_begin;
+
+		if (value_end || empty) {
+			if (tea_tcursor_kv_add(tab, &str[key_begin], key_end - key_begin, &str[value_begin], value_end)) {
+				return -1;
+			}
 		}
 	}
 
@@ -52,7 +56,8 @@ static int pack_kv_key(struct tea_tcursor_kv *tab, char flag, const char *str, s
 	size_t match;
 	size_t i;
 
-	char ignore = flag & TEA_PACK_FLAG_IGNORE_EMPTY;
+	char empty = !(flag & TEA_PACK_FLAG_IGNORE_EMPTY);
+
 	char trim = flag & TEA_PACK_FLAG_SPACE_TRIM;
 
 	for(i = 0; i < len;) {
@@ -74,8 +79,12 @@ static int pack_kv_key(struct tea_tcursor_kv *tab, char flag, const char *str, s
 			TEA_PACK_SPACE_TRIM_WORD(str, value_begin, value_end);
 		}
 
-		if (tea_tcursor_kv_add(tab, ignore, &str[key_begin], key_end - key_begin, &str[value_begin], value_end - value_begin)) {
-			return -1;
+		value_end -= value_begin;
+
+		if (value_end || empty) {
+			if (tea_tcursor_kv_add(tab, &str[key_begin], key_end - key_begin, &str[value_begin], value_end)) {
+				return -1;
+			}
 		}
 	}
 
@@ -96,7 +105,7 @@ static int pack_kv_multi(struct tea_tcursor_kv *tab, char flag, const char *str,
 	TEA_PACK_MULTI_DICT_INIT(sp_dict, i, sp, spl);
 	TEA_PACK_MULTI_DICT_INIT(eq_dict, i, eq, eql);
 
-	char ignore = flag & TEA_PACK_FLAG_IGNORE_EMPTY;
+	char empty = !(flag & TEA_PACK_FLAG_IGNORE_EMPTY);
 	char trim = flag & TEA_PACK_FLAG_SPACE_TRIM;
 
 	for(i = 0; i < len;) {
@@ -118,8 +127,12 @@ static int pack_kv_multi(struct tea_tcursor_kv *tab, char flag, const char *str,
 			TEA_PACK_SPACE_TRIM_WORD(str, value_begin, value_end);
 		}
 
-		if (tea_tcursor_kv_add(tab, ignore, &str[key_begin], key_end - key_begin, &str[value_begin], value_end - value_begin)) {
-			return -1;
+		value_end -= value_begin;
+
+		if (value_end || empty) {
+			if (tea_tcursor_kv_add(tab, &str[key_begin], key_end - key_begin, &str[value_begin], value_end)) {
+				return -1;
+			}
 		}
 	}
 
@@ -162,7 +175,7 @@ static int pack_char(struct tea_tcursor *tab, char flag, const char *str, size_t
 	size_t value_end;
 	size_t i;
 
-	char ignore = flag & TEA_PACK_FLAG_IGNORE_EMPTY;
+	char empty = !(flag & TEA_PACK_FLAG_IGNORE_EMPTY);
 	char trim = flag & TEA_PACK_FLAG_SPACE_TRIM;
 
 	for(i = 0; i < len;) {
@@ -177,8 +190,12 @@ static int pack_char(struct tea_tcursor *tab, char flag, const char *str, size_t
 			TEA_PACK_SPACE_TRIM_WORD(str, value_begin, value_end);
 		}
 
-		if (tea_tcursor_add(tab, ignore, &str[value_begin], value_end - value_begin)) {
-			return -1;
+		value_end -= value_begin;
+
+		if (value_end || empty) {
+			if (tea_tcursor_add(tab, &str[value_begin], value_end)) {
+				return -1;
+			}
 		}
 	}
 
@@ -192,7 +209,7 @@ static int pack_key(struct tea_tcursor *tab, char flag, const char *str, size_t 
 	size_t match;
 	size_t i;
 
-	char ignore = flag & TEA_PACK_FLAG_IGNORE_EMPTY;
+	char empty = !(flag & TEA_PACK_FLAG_IGNORE_EMPTY);
 	char trim = flag & TEA_PACK_FLAG_SPACE_TRIM;
 
 	for(i = 0; i < len;) {
@@ -207,8 +224,12 @@ static int pack_key(struct tea_tcursor *tab, char flag, const char *str, size_t 
 			TEA_PACK_SPACE_TRIM_WORD(str, value_begin, value_end);
 		}
 
-		if (tea_tcursor_add(tab, ignore, &str[value_begin], value_end - value_begin)) {
-			return -1;
+		value_end -= value_begin;
+
+		if (value_end || empty) {
+			if (tea_tcursor_add(tab, &str[value_begin], value_end)) {
+				return -1;
+			}
 		}
 	}
 
@@ -225,7 +246,7 @@ static int pack_multi(struct tea_tcursor *tab, char flag, const char *str, size_
 
 	TEA_PACK_MULTI_DICT_INIT(sp_dict, i, sp, spl);
 
-	char ignore = flag & TEA_PACK_FLAG_IGNORE_EMPTY;
+	char empty = !(flag & TEA_PACK_FLAG_IGNORE_EMPTY);
 	char trim = flag & TEA_PACK_FLAG_SPACE_TRIM;
 
 	for(i = 0; i < len;) {
@@ -240,8 +261,12 @@ static int pack_multi(struct tea_tcursor *tab, char flag, const char *str, size_
 			TEA_PACK_SPACE_TRIM_WORD(str, value_begin, value_end);
 		}
 
-		if (tea_tcursor_add(tab, ignore, &str[value_begin], value_end - value_begin)) {
-			return -1;
+		value_end -= value_begin;
+
+		if (value_end || empty) {
+			if (tea_tcursor_add(tab, &str[value_begin], value_end)) {
+				return -1;
+			}
 		}
 	}
 

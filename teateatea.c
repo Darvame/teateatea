@@ -22,7 +22,7 @@ static void metatable_tostring(lua_State *l, int obj)
 	}
 }
 
-static int pack_kv_call(lua_State *l, char flag)
+static int pack_kv(lua_State *l)
 {
 	int argc = lua_gettop(l);
 
@@ -35,9 +35,13 @@ static int pack_kv_call(lua_State *l, char flag)
 	const char *str = NULL;
 
 	char ignore = 0;
+	char trim = 0;
+	char multi = 0;
 
-	switch (argc <= 4 ? argc : 4) {
-		case 4: ignore = lua_toboolean(l, 4) ? TEA_PACK_FLAG_IGNORE_EMPTY : 0;
+	switch (argc <= 6 ? argc : 6) {
+		case 6: if (lua_toboolean(l, 6)) multi = TEA_PACK_FLAG_MULTI;
+		case 5: if (lua_toboolean(l, 5)) trim = TEA_PACK_FLAG_SPACE_TRIM;
+		case 4: if (lua_toboolean(l, 4)) ignore = TEA_PACK_FLAG_IGNORE_EMPTY;
 		case 3: sp = lua_tolstring(l, 3, &spl);
 		case 2: eq = lua_tolstring(l, 2, &eql);
 		case 1:
@@ -48,31 +52,10 @@ static int pack_kv_call(lua_State *l, char flag)
 			str = lua_tolstring(l, 1, &len);
 	}
 
-	return tea_pack_kv(l, flag | ignore, str, len, eq, eql, sp, spl);
+	return tea_pack_kv(l, (ignore | trim | multi), str, len, eq, eql, sp, spl);
 }
 
-static int pack_mtkv(lua_State *l)
-{
-	return pack_kv_call(l, TEA_PACK_FLAG_SPACE_TRIM | TEA_PACK_FLAG_MULTI);
-}
-
-static int pack_tkv(lua_State *l)
-{
-	return pack_kv_call(l, TEA_PACK_FLAG_SPACE_TRIM);
-}
-
-static int pack_mkv(lua_State *l)
-{
-	return pack_kv_call(l, TEA_PACK_FLAG_MULTI);
-}
-
-static int pack_kv(lua_State *l)
-{
-	return pack_kv_call(l, 0);
-}
-
-
-static int pack_call(lua_State *l, char flag)
+static int pack(lua_State *l)
 {
 	int argc = lua_gettop(l);
 
@@ -83,9 +66,13 @@ static int pack_call(lua_State *l, char flag)
 	const char *sp = NULL;
 
 	char ignore = 0;
+	char trim = 0;
+	char multi = 0;
 
-	switch (argc <= 3 ? argc : 3) {
-		case 3: ignore = lua_toboolean(l, 3) ? TEA_PACK_FLAG_IGNORE_EMPTY : 0;
+	switch (argc <= 5 ? argc : 5) {
+		case 5: if (lua_toboolean(l, 5)) multi = TEA_PACK_FLAG_MULTI;
+		case 4: if (lua_toboolean(l, 4)) trim = TEA_PACK_FLAG_SPACE_TRIM;
+		case 3: if (lua_toboolean(l, 3)) ignore = TEA_PACK_FLAG_IGNORE_EMPTY;
 		case 2: sp = lua_tolstring(l, 2, &spl);
 		case 1:
 			if (utable(l, 1)) {
@@ -95,29 +82,8 @@ static int pack_call(lua_State *l, char flag)
 			str = lua_tolstring(l, 1, &len);
 	}
 
-	return tea_pack(l, flag | ignore, str, len, sp, spl);
+	return tea_pack(l, (ignore | trim | multi), str, len, sp, spl);
 }
-
-static int pack_mt(lua_State *l)
-{
-	return pack_call(l, TEA_PACK_FLAG_SPACE_TRIM | TEA_PACK_FLAG_MULTI);
-}
-
-static int pack_t(lua_State *l)
-{
-	return pack_call(l, TEA_PACK_FLAG_SPACE_TRIM);
-}
-
-static int pack_m(lua_State *l)
-{
-	return pack_call(l, TEA_PACK_FLAG_MULTI);
-}
-
-static int pack(lua_State *l)
-{
-	return pack_call(l, 0);
-}
-
 
 static int trim(lua_State *l)
 {
@@ -150,13 +116,7 @@ static int trim(lua_State *l)
 }
 
 static const luaL_Reg api_list[] = {
-	{"mtkvpack", pack_mtkv},
-	{"tkvpack", pack_tkv},
-	{"mkvpack", pack_mkv},
 	{"kvpack", pack_kv},
-	{"mtpack", pack_mt},
-	{"mpack", pack_m},
-	{"tpack", pack_t},
 	{"pack", pack},
 	{"trim", trim},
 
