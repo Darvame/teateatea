@@ -1,5 +1,5 @@
 # TEATEATEA
-------
+
 <b>Teh Lua Lib, provides easy way to do some stuff with strings:</b>
 
 - pack (split) separated values into table
@@ -15,11 +15,14 @@
     local trimed_str = teateatea.trim(str)
 ```
 
+---
+
 <b>checkout [example.lua](./example.lua) for examples and more info </b>
 
 ---
+
 # BUILDING & INSTALLATION
----
+
 <h3>Downloading:</h3>
 
 ```bash
