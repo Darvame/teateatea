@@ -19,9 +19,9 @@ local tab = tea.pack(str, ";"); -- doing the same
 		[1] = 'abc',
 		[2] = 'bcd',
 		[3] = 'qwerty',
+		[4] = '',
 		[5] = '',
-		[6] = '',
-		[4] = 'lol',
+		[6] = 'lol',
 	}
 ]]
 
@@ -36,9 +36,9 @@ local tab = tea.pack(str, "CUT");
 		[1] = 'abc',
 		[2] = 'bcd',
 		[3] = 'qwerty',
+		[4] = '',
 		[5] = '',
-		[6] = '',
-		[4] = 'lol',
+		[6] = 'lol',
 	}
 ]]
 
@@ -84,7 +84,7 @@ local tab = tea.pack(str, ";! ", nil, true, true); -- 5th arg goes true (now usi
 		[1] = 'one',
 		[2] = 'two',
 		[3] = 'three',
-		[5] = 'foh',
+		[4] = 'foh',
 	}
 ]]
 
