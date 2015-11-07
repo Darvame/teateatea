@@ -32,6 +32,12 @@ cd teateatea
 
 <h3>Setting Variables:</h3>
 
+```bash
+#by default sudo does not pass variables
+#you may need to run everything bellow (from this point) with root
+#in order to use '$ make install'
+su -
+```
 - <b>with pgk-config</b>
 ```bash
 export LUAPKG=lua5.2 #or any ('luajit', 'lua5.1', 'lua5.3')
@@ -52,5 +58,5 @@ export CC=clang #if build on osx
 <h3>Building & Installing:</h3>
 
 ```bash
-make && sudo make install
+make && make install
 ```
