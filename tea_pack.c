@@ -141,7 +141,10 @@ static int pack_kv_multi(struct tea_tcursor_kv *tab, char flag, const char *str,
 
 int tea_pack_kv(lua_State *l, char flag, const char *str, size_t len, const char *eq, size_t eql, const char *sp, size_t spl)
 {
-	struct tea_tcursor_kv tab = {};
+	struct tea_tcursor_kv tab;
+
+	TEA_TCURSOR_KV_INIT(&tab);
+
 	int stat;
 
 	if(eql < 2 && spl < 2) {
@@ -275,7 +278,10 @@ static int pack_multi(struct tea_tcursor *tab, char flag, const char *str, size_
 
 int tea_pack(lua_State *l, char flag, const char *str, size_t len, const char *sp, size_t spl)
 {
-	struct tea_tcursor tab = {};
+	struct tea_tcursor tab;
+
+	TEA_TCURSOR_INIT(&tab);
+
 	int stat;
 
 	if(spl < 2) {

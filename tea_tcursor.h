@@ -1,10 +1,16 @@
 #include "lua.h"
 
-#define TEA_TCURSOR_WORKLOAD 32
-#define TEA_TCURSOR_INITITAL 48
+#define TEA_TCURSOR_WORKLOAD 128
+#define TEA_TCURSOR_INITITAL 64
 
-#define TEA_TCURSOR_KV_WORKLOAD 16
-#define TEA_TCURSOR_KV_INITIAL 24
+#define TEA_TCURSOR_KV_WORKLOAD 64
+#define TEA_TCURSOR_KV_INITIAL 32
+
+#define TEA_TCURSOR_INIT(c)\
+	(c)->size = 0;\
+	(c)->parts = 0;
+
+#define TEA_TCURSOR_KV_INIT TEA_TCURSOR_INIT
 
 struct tea_tcursor_part {
 	size_t used;
@@ -23,7 +29,7 @@ struct tea_tcursor {
 };
 
 int tea_tcursor_add(struct tea_tcursor *, const char *, size_t);
-void tea_tcursor_dump(lua_State *L, struct tea_tcursor *);
+void tea_tcursor_dump(lua_State *, struct tea_tcursor *);
 
 struct tea_tcursor_kv_part {
 	size_t used;
@@ -46,4 +52,4 @@ struct tea_tcursor_kv {
 };
 
 int tea_tcursor_kv_add(struct tea_tcursor_kv *, const char *, size_t, const char *, size_t);
-void tea_tcursor_kv_dump(lua_State *L, struct tea_tcursor_kv *);
+void tea_tcursor_kv_dump(lua_State *, struct tea_tcursor_kv *);
