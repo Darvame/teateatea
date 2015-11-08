@@ -82,9 +82,11 @@ local tab = tea.pack(str, ";! ", nil, true, true); -- 5th arg goes true (now usi
 --[[
 	tab = {
 		[1] = 'one',
-		[2] = 'two',
-		[3] = 'three',
-		[4] = 'foh',
+		[2] = '',
+		[3] = 'two',
+		[4] = 'three',
+		[5] = '',
+		[6] = 'foh',
 	}
 ]]
 
