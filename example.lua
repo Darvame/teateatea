@@ -135,9 +135,24 @@ local tab = tea.kvpack(str, "=-?", ";:!", false, false, true); -- 6th arg goes t
 
 --- *** empty keys are not supported!
 
-local str = "key1=value1;ignore;=broken_value;   =trimed_key; key2 = value2";
+local str = "key1=value1;;;;;=broken;   =broken_trimed_key; key2 = value2; key3=;key4";
 
-local tab = tea.kvpack(str, "=", ";", true, true); -- alose trim whitespaces and ignore empty
+local tab = tea.kvpack(str, "=", ";", false, true); -- trim whitespaces
+
+--[[
+	tab = {
+		["key1"] = "value1",
+		["key2"] = "value2",
+		["key3"] = "",
+		["key4"] = "",
+	}
+]]
+
+--- *** drop empty values
+
+local str = "key1=value1;=broken;   =broken_trimed_key; key2 = value2; key3=;key4";
+
+local tab = tea.kvpack(str, "=", ";", true, true); -- also ignore empty
 
 --[[
 	tab = {

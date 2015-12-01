@@ -9,49 +9,47 @@
 #define TEA_PACK_EQ_DEFAULT '='
 #define TEA_PACK_SP_DEFAULT ';'
 
-#define TEA_PACK_SAFE_INC(i, len)\
-	if (++i >= len) return 0;
-
 
 #define TEA_PACK_SEEK_WORD_KEY_END(k, i, m, s, l, eq, eql, sp, spl)\
 	m = 0;\
-	while(m < eql) {\
+	while(i < l) {\
 		if (s[i] == eq[0]) {\
-			TEA_PACK_SAFE_INC(i, l);\
-			while(++m < eql && s[i] == eq[m]) TEA_PACK_SAFE_INC(i, l);\
-			if (m >= eql) continue;\
-			i-= m; m = 0;\
+			++i;\
+			while(i < l && ++m < eql && s[i] == eq[m]) ++i;\
+			if (m >= eql) break;\
+			i-= m;\
+			m = 0;\
 		}\
 		if (s[i] == sp[0]) {\
-			TEA_PACK_SAFE_INC(i, l);\
-			while(++m < spl && s[i] == sp[m]) TEA_PACK_SAFE_INC(i, l);\
-			m = m == spl ? eql + 1 : 0;\
+			++i;\
+			while(i < l && ++m < spl && s[i] == sp[m]) ++i;\
+			if (m >= spl) { i-= m; m = 0; break; }\
+			m = 0;\
 		} else {\
-			TEA_PACK_SAFE_INC(i, l);\
+			++i;\
 		}\
 	}\
-	if(m > eql) continue;\
-	k = i - eql;
+	k = i - m;
 
 #define TEA_PACK_SEEK_WORD_VALUE_END(v, i, m, s, l, sp, spl)\
 	m = 0;\
-	while(m < spl && i < l) {\
+	while(i < l && m < spl) {\
 		if (s[i++] == sp[0]) {\
 			m = 0;\
 			while(++m < spl && i < l && s[i] == sp[m]) ++i;\
 		}\
 	}\
-	v = i < l ? (i - spl) : (i - m);
+	v = i < l ? (i - spl) : (i - m);\
+	if (!m) ++i;
 
 
 #define TEA_PACK_SEEK_KEY_END(k, i, s, l, eq, sp)\
-	while(s[i] != eq && s[i] != sp) TEA_PACK_SAFE_INC(i, l);\
-	if(s[i] != eq) {++i; continue;}\
-	k = i;\
-	TEA_PACK_SAFE_INC(i, l);
+	while((i < l) && (s[i] != eq) && (s[i] != sp)) ++i;\
+	if (s[i] != eq) k = i;\
+	else k = i++;
 
 #define TEA_PACK_SEEK_VALUE_END(v, i, s, l, sp)\
-	while((s[i] != sp) && (++i < l));\
+	while((i < l) && (s[i] != sp)) ++i;\
 	v = i++;
 
 
@@ -66,15 +64,12 @@
 	(TEA_PACK_UCCHAR(c) < TEA_PACK_MULTI_DICT_SIZE && d[TEA_PACK_UCCHAR(c)])
 
 #define TEA_PACK_SEEK_MULTI_KEY_END(k, i, s, l, eqd, spd)\
-	while(!TEA_PACK_MULTI_INDICT(eqd, s[i]) && !TEA_PACK_MULTI_INDICT(spd, s[i]))\
-		TEA_PACK_SAFE_INC(i, l);\
-	if(!TEA_PACK_MULTI_INDICT(eqd, s[i]))\
-		{++i; continue;}\
-	k = i;\
-	TEA_PACK_SAFE_INC(i, l);
+	while((i < l) && !TEA_PACK_MULTI_INDICT(eqd, s[i]) && !TEA_PACK_MULTI_INDICT(spd, s[i])) ++i;\
+	if (!TEA_PACK_MULTI_INDICT(eqd, s[i])) k = i;\
+	else k = i++;\
 
 #define TEA_PACK_SEEK_MULTI_VALUE_END(v, i, s, l, spd)\
-	while(!TEA_PACK_MULTI_INDICT(spd, s[i]) && (++i < l));\
+	while((i < l) && !TEA_PACK_MULTI_INDICT(spd, s[i])) ++i;\
 	v = i++;
 
 

@@ -181,7 +181,7 @@ static int pack_char(struct tea_tcursor *tab, char flag, const char *str, size_t
 	char empty = !(flag & TEA_PACK_FLAG_IGNORE_EMPTY);
 	char trim = flag & TEA_PACK_FLAG_SPACE_TRIM;
 
-	for(i = 0; i < len;) {
+	for (i = 0; i <= len;) {
 		// value: begin
 		value_begin = i;
 
@@ -215,7 +215,7 @@ static int pack_key(struct tea_tcursor *tab, char flag, const char *str, size_t 
 	char empty = !(flag & TEA_PACK_FLAG_IGNORE_EMPTY);
 	char trim = flag & TEA_PACK_FLAG_SPACE_TRIM;
 
-	for(i = 0; i < len;) {
+	for(i = 0; i <= len;) {
 		// value: begin
 		value_begin = i;
 
@@ -252,7 +252,7 @@ static int pack_multi(struct tea_tcursor *tab, char flag, const char *str, size_
 	char empty = !(flag & TEA_PACK_FLAG_IGNORE_EMPTY);
 	char trim = flag & TEA_PACK_FLAG_SPACE_TRIM;
 
-	for(i = 0; i < len;) {
+	for(i = 0; i <= len;) {
 		// value: begin
 		value_begin = i;
 

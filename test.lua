@@ -73,6 +73,8 @@ do
 		t[i] = tostring(i);
 	end
 
+	t[#t+1] = '';
+
 	eqlTables(tea.pack(str), t);
 end
 ok(); -- 0
@@ -179,11 +181,12 @@ ok(); -- 18
 -- .pack_kv
 crunning = "kvpack";
 
-eqlkvTables(tea.kvpack("a=b;c=d;x= y ;broken;12345=12345"), {
+eqlkvTables(tea.kvpack("a=b;c=d;x= y ;empty;12345=12345"), {
 	["a"] = "b";
 	["c"] = "d";
 	["x"] = " y ";
 	["12345"]="12345";
+	["empty"] = "";
 }, "';'");
 ok(); -- 19
 
@@ -202,30 +205,33 @@ eqlkvTables(tea.kvpack("key1=value1&key2=value2&key3=value3&key4=value4&", nil, 
 }, "&qry");
 ok(); -- 21
 
-eqlkvTables(tea.kvpack("key1endsvalue1endlkey2endsvalue2endlbrokenkeyendlendlkey3endsvalue3endlkey4endsvalue4endl", "ends", "endl"), {
+eqlkvTables(tea.kvpack("key1endsvalue1endlkey2endsvalue2endlemptyendlendlkey3endsvalue3endlkey4endsvalue4endl", "ends", "endl"), {
 	["key1"] = "value1";
 	["key2"] = "value2";
 	["key3"] = "value3";
 	["key4"] = "value4";
+	["empty"] = "";
 }, "*almost same");
 ok(); -- 22
 
 -- .pack_tkv
 crunning = "tkvpack";
 
-eqlkvTables(tea.kvpack("a=b;c=d;x= y ;broken     ; 1234 5 =12345   ;", nil, nil, nil, true), {
+eqlkvTables(tea.kvpack("a=b;c=d;x= y ;empty     ;   ;1234 5 =12345   ;", nil, nil, nil, true), {
 	["a"] = "b";
 	["c"] = "d";
 	["x"] = "y";
 	["1234 5"]="12345";
+	["empty"] = "";
 }, "';'");
 ok(); -- 23
 
-eqlkvTables(tea.kvpack(setmetatable({}, { __tostring = function() return "a=b;c=d;x= y ;broken     ; 1234 5 =12345   ;" end }), nil, nil, nil, true), {
+eqlkvTables(tea.kvpack(setmetatable({}, { __tostring = function() return "a=b;c=d;x= y ;empty     ;  ;1234 5 =12345   ;" end }), nil, nil, nil, true), {
 	["a"] = "b";
 	["c"] = "d";
 	["x"] = "y";
 	["1234 5"]="12345";
+	["empty"] = "";
 }, "';' meta");
 ok(); -- 24
 
@@ -245,7 +251,9 @@ eqlkvTables(tea.kvpack("key1=value1&    key2=value2&key3=value3&key4=value4&&&&&
 ok(); -- 26
 
 eqlkvTables(tea.kvpack("abc k2l1 123 2l yolo k2l garb", "k2l1", "2l", nil, true), {
-	["abc"] = "123"
+	["abc"] = "123";
+	["yolo k"] = "";
+	["garb"] = "";
 }, "*key inside");
 ok(); -- 27
 
@@ -259,11 +267,12 @@ eqlkvTables(tea.kvpack("a b c d x  y  notbroken 12345 12345", " !", " ?", true, 
 }, "only*space; same keys");
 ok(); -- 28
 
-eqlkvTables(tea.kvpack("a=b;c=d,x= y ;empty=!broken!12345=12345", "=", ";,!", nil, nil, true), {
+eqlkvTables(tea.kvpack("a=b;c=d,x= y ;empty=!empty2!!12345=12345", "=", ";,!", nil, nil, true), {
 	["a"] = "b";
 	["c"] = "d";
 	["x"] = " y ";
 	["empty"] = "";
+	["empty2"] = "";
 	["12345"]="12345";
 }, "';'");
 ok(); -- 29
@@ -271,11 +280,12 @@ ok(); -- 29
 -- .pack_mtkv
 crunning = "mtkvpack";
 
-eqlkvTables(tea.kvpack("a=b;c=d,x= y ;broken     ! 1234 5 =12345   ?", nil, "!;,?", nil, true, true), {
+eqlkvTables(tea.kvpack("a=b;c=d,x= y ;empty!     ! 1234 5 =12345   ?", nil, "!;,?", nil, true, true), {
 	["a"] = "b";
 	["c"] = "d";
 	["x"] = "y";
 	["1234 5"]="12345";
+	["empty"] = "";
 }, "!;,?");
 ok(); -- 30
 
@@ -284,15 +294,17 @@ eqlkvTables(tea.kvpack("a=b;c=d,x- y ;empty-        !broken     ! 1234 5 =12345 
 	["c"] = "d";
 	["x"] = "y";
 	["empty"] = "";
+	["broken"] = "";
 	["1234 5"]="12345";
 }, "!;,?|=-");
 ok(); -- 31
 
-eqlkvTables(tea.kvpack(setmetatable({}, { __tostring = function() return "a=b;c=d;x= y ;broken     ; 1234 5 =12345   ;" end }), nil, nil, nil, true, true), {
+eqlkvTables(tea.kvpack(setmetatable({}, { __tostring = function() return "a=b;c=d;x= y ;empty     ; 1234 5 =12345   ;" end }), nil, nil, nil, true, true), {
 	["a"] = "b";
 	["c"] = "d";
 	["x"] = "y";
 	["1234 5"]="12345";
+	["empty"] = "";
 }, "';' meta");
 ok(); -- 32
 
