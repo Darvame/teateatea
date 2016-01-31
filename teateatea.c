@@ -5,7 +5,7 @@
 #include "tea_tcursor.h"
 #include "tea_pack.h"
 
-static int utable(lua_State *l, int obj)
+static __inline__ int utable(lua_State *l, int obj)
 {
 	int type = lua_type(l, obj);
 	return (type == LUA_TTABLE || type == LUA_TUSERDATA);
@@ -34,14 +34,13 @@ static int pack_kv(lua_State *l)
 	const char *sp = NULL;
 	const char *str = NULL;
 
-	char ignore = 0;
-	char trim = 0;
-	char multi = 0;
+	char flag = 0;
 
-	switch (argc <= 6 ? argc : 6) {
-		case 6: if (lua_toboolean(l, 6)) multi = TEA_PACK_FLAG_MULTI;
-		case 5: if (lua_toboolean(l, 5)) trim = TEA_PACK_FLAG_SPACE_TRIM;
-		case 4: if (lua_toboolean(l, 4)) ignore = TEA_PACK_FLAG_IGNORE_EMPTY;
+	switch (argc <= 7 ? argc : 7) {
+		case 7: if (lua_toboolean(l, 7)) flag|= TEA_PACK_FLAG_VALUE_MULTI;
+		case 6: if (lua_toboolean(l, 6)) flag|= TEA_PACK_FLAG_KEY_MULTI;
+		case 5: if (lua_toboolean(l, 5)) flag|= TEA_PACK_FLAG_SPACE_TRIM;
+		case 4: if (lua_toboolean(l, 4)) flag|= TEA_PACK_FLAG_IGNORE_EMPTY;
 		case 3: sp = lua_tolstring(l, 3, &spl);
 		case 2: eq = lua_tolstring(l, 2, &eql);
 		case 1:
@@ -52,7 +51,7 @@ static int pack_kv(lua_State *l)
 			str = lua_tolstring(l, 1, &len);
 	}
 
-	return tea_pack_kv(l, (ignore | trim | multi), str, len, eq, eql, sp, spl);
+	return tea_pack_kv(l, flag, str, len, eq, eql, sp, spl);
 }
 
 static int pack(lua_State *l)
@@ -65,14 +64,12 @@ static int pack(lua_State *l)
 	const char *str = NULL;
 	const char *sp = NULL;
 
-	char ignore = 0;
-	char trim = 0;
-	char multi = 0;
+	char flag = 0;
 
 	switch (argc <= 5 ? argc : 5) {
-		case 5: if (lua_toboolean(l, 5)) multi = TEA_PACK_FLAG_MULTI;
-		case 4: if (lua_toboolean(l, 4)) trim = TEA_PACK_FLAG_SPACE_TRIM;
-		case 3: if (lua_toboolean(l, 3)) ignore = TEA_PACK_FLAG_IGNORE_EMPTY;
+		case 5: if (lua_toboolean(l, 5)) flag|= TEA_PACK_FLAG_VALUE_MULTI;
+		case 4: if (lua_toboolean(l, 4)) flag|= TEA_PACK_FLAG_SPACE_TRIM;
+		case 3: if (lua_toboolean(l, 3)) flag|= TEA_PACK_FLAG_IGNORE_EMPTY;
 		case 2: sp = lua_tolstring(l, 2, &spl);
 		case 1:
 			if (utable(l, 1)) {
@@ -82,7 +79,7 @@ static int pack(lua_State *l)
 			str = lua_tolstring(l, 1, &len);
 	}
 
-	return tea_pack(l, (ignore | trim | multi), str, len, sp, spl);
+	return tea_pack(l, flag, str, len, sp, spl);
 }
 
 static int trim(lua_State *l)

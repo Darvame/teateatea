@@ -8,7 +8,7 @@
 ```
 - pack (split) separated keys and values into key-value table
 ```lua
-    local table = teateatea.kvpack(str[, equal, separator, drop_empty, trim_whitespaces, multi_sep_equal])
+    local table = teateatea.kvpack(str[, equal, separator, drop_empty, trim_whitespaces, multi_equal, multi_separators])
 ```
 - trim whitespaces
 ```lua
@@ -33,10 +33,12 @@ cd teateatea
 <h3>Setting Variables:</h3>
 
 ```bash
-#by default sudo does not pass variables
+#by default sudo does not pass exported variables
 #you may need to run everything bellow (from this point) with root
 #in order to use '$ make install'
 su -
+#or call make with specified variables
+make CC=clang
 ```
 - <b>with pgk-config</b>
 ```bash

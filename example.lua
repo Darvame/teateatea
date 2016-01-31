@@ -123,7 +123,19 @@ local tab = tea.kvpack(str, "is equal", "and", false, true); -- use long sep/eq,
 
 local str = "key1-value1:key2=value2;key3?value3!";
 
-local tab = tea.kvpack(str, "=-?", ";:!", false, false, true); -- 6th arg goes true
+local tab = tea.kvpack(str, "=-?", ";:!", false, false, true, true); -- 6th (for eq) and 7th (for sep) args goes true
+
+--[[
+	tab = {
+		["key1"] = "value1",
+		["key2"] = "value2",
+		["key3"] = "value3",
+	}
+]]
+
+local str = "key1=value1:key2=value2;key3=value3!";
+
+local tab = tea.kvpack(str, "=", ";:!", false, false, false, true); -- only 7th goes true, if using multiple separators
 
 --[[
 	tab = {
