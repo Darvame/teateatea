@@ -165,9 +165,7 @@ static int pack_kv_multi_key(struct tea_tcursor_kv *tab, char flag, const char *
 		key_begin = i;
 
 		// key: end
-		//TEA_PACK_SEEK_MULTI_KEY_END(key_end, i, str, len, eq_dict);
 		TEA_PACK_SEEK_MULTI_WORD_KEY_END_REVERSE(key_end, i, match, str, len, sp, spl, eq_dict);
-		//TEA_PACK_SEEK_MULTI_WORD_KEY_END(key_end, i, match, str, len, eq, eql, sp_dict);
 
 		// value: begin
 		value_begin = i;
@@ -267,13 +265,13 @@ int tea_pack_kv(lua_State *l, char flag, const char *str, size_t len, const char
 				stat = pack_kv_multi_value(&tab, flag, str, len, eq, eql, sp, spl); break;
 			case TEA_PACK_FLAG_KEYVALUE_MULTI:
 				stat = pack_kv_multi(&tab, flag, str, len, eq, eql, sp, spl); break;
-			default:
+			case 0: default:
 				stat = pack_kv_word(&tab, flag, str, len, eq, eql, sp, spl); break;
 		}
 	}
 
 	if (stat) {
-		luaL_error(l, "unable to pack %s", str);
+		luaL_error(l, "unable to perform key-value pack string '%s'", str);
 	}
 
 	tea_tcursor_kv_dump(l, &tab);
@@ -406,7 +404,7 @@ int tea_pack(lua_State *l, char flag, const char *str, size_t len, const char *s
 	}
 
 	if (stat) {
-		luaL_error(l, "unable to pack %s", str);
+		luaL_error(l, "unable to perform key pack string '%s'", str);
 	}
 
 	tea_tcursor_dump(l, &tab);

@@ -96,21 +96,21 @@
 	k = i - m;
 
 #define TEA_PACK_SEEK_MULTI_WORD_KEY_END_REVERSE(k, i, m, s, l, sp, spl, eqd)\
-		m = 0;\
-		while(i < l) {\
-			if (s[i] == sp[0]) {\
-				++i;\
-				while(i < l && ++m < spl && s[i] == sp[m]) ++i;\
-				if (m >= spl) break;\
-				i-= m;\
-				m = 0;\
-			}\
-			if (TEA_PACK_MULTI_INDICT(eqd, s[i])) {\
-				++i; m = 1; break;\
-			}\
+	m = 0;\
+	while(i < l) {\
+		if (s[i] == sp[0]) {\
 			++i;\
+			while(i < l && ++m < spl && s[i] == sp[m]) ++i;\
+			if (m >= spl) break;\
+			i-= m;\
+			m = 0;\
 		}\
-		k = i - m;
+		if (TEA_PACK_MULTI_INDICT(eqd, s[i])) {\
+			++i; m = 1; break;\
+		}\
+		++i;\
+	}\
+	k = i - m;
 
 #define TEA_PACK_SEEK_MULTI_WORD_VALUE_END TEA_PACK_SEEK_WORD_VALUE_END
 
