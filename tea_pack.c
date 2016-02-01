@@ -142,10 +142,6 @@ static int pack_kv_multi(struct tea_tcursor_kv *tab, char flag, const char *str,
 
 static int pack_kv_multi_key(struct tea_tcursor_kv *tab, char flag, const char *str, size_t len, const char *eq, size_t eql, const char *sp, size_t spl)
 {
-	if (spl < 2) {
-		return pack_kv_multi(tab, flag, str, len, eq, eql, sp, spl);
-	}
-
 	char eq_dict[TEA_PACK_MULTI_DICT_SIZE] = {};
 
 	size_t key_begin;
@@ -193,10 +189,6 @@ static int pack_kv_multi_key(struct tea_tcursor_kv *tab, char flag, const char *
 
 static int pack_kv_multi_value(struct tea_tcursor_kv *tab, char flag, const char *str, size_t len, const char *eq, size_t eql, const char *sp, size_t spl)
 {
-	if (eql < 2) {
-		return pack_kv_multi(tab, flag, str, len, eq, eql, sp, spl);
-	}
-
 	char sp_dict[TEA_PACK_MULTI_DICT_SIZE] = {};
 
 	size_t key_begin;
@@ -241,7 +233,7 @@ static int pack_kv_multi_value(struct tea_tcursor_kv *tab, char flag, const char
 
 	return 0;
 }
-#include "stdio.h"
+
 int tea_pack_kv(lua_State *l, char flag, const char *str, size_t len, const char *eq, size_t eql, const char *sp, size_t spl)
 {
 	struct tea_tcursor_kv tab;
@@ -260,9 +252,17 @@ int tea_pack_kv(lua_State *l, char flag, const char *str, size_t len, const char
 
 		switch(flag & TEA_PACK_FLAG_KEYVALUE_MULTI) {
 			case TEA_PACK_FLAG_KEY_MULTI:
-				stat = pack_kv_multi_key(&tab, flag, str, len, eq, eql, sp, spl); break;
+				if (spl > 1)
+				 	if (eql > 1) stat = pack_kv_multi_key(&tab, flag, str, len, eq, eql, sp, spl);
+					else stat = pack_kv_word(&tab, flag, str, len, eq, eql, sp, spl);
+				else stat = pack_kv_multi(&tab, flag, str, len, eq, eql, sp, spl);
+				break;
 			case TEA_PACK_FLAG_VALUE_MULTI:
-				stat = pack_kv_multi_value(&tab, flag, str, len, eq, eql, sp, spl); break;
+				if (eql > 1)
+					if (spl > 1) stat = pack_kv_multi_value(&tab, flag, str, len, eq, eql, sp, spl);
+					else stat = pack_kv_word(&tab, flag, str, len, eq, eql, sp, spl);
+				else stat = pack_kv_multi(&tab, flag, str, len, eq, eql, sp, spl);
+				break;
 			case TEA_PACK_FLAG_KEYVALUE_MULTI:
 				stat = pack_kv_multi(&tab, flag, str, len, eq, eql, sp, spl); break;
 			case 0: default:
