@@ -104,7 +104,9 @@ static int trim(lua_State *l)
 	TEA_PACK_SPACE_TRIM_WORD(str, begin, end);
 
 	if (begin == 0 && end == len) {
-		lua_pushvalue(l, 1);
+		if (argc > 1) {
+			lua_pop(l, argc - 1);
+		}
 	} else {
 		lua_pushlstring(l, &str[begin], end - begin);
 	}

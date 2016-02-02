@@ -76,8 +76,6 @@
 	while((i < l) && !TEA_PACK_MULTI_INDICT(spd, s[i])) ++i;\
 	v = i++;
 
-#define TEA_PACK_SEEK_MULTI_KEY_END TEA_PACK_SEEK_MULTI_VALUE_END
-
 #define TEA_PACK_SEEK_MULTI_WORD_KEY_END(k, i, m, s, l, eq, eql, spd)\
 	m = 0;\
 	while(i < l) {\
