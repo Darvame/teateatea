@@ -1,12 +1,12 @@
 # TEATEATEA
 
-<b>Teh Lua Lib, provides easy way to do some stuff with strings:</b>
+<b>Teh Lua Lib, that provides easy way to do some stuff with strings:</b>
 
-- pack (split) separated values into table
+- pack (split) separated values into a new array table
 ```lua
     local table = teateatea.pack(str[, separator, ignore_empty, trim_whitespaces, multi_separators])
 ```
-- pack (split) separated keys and values into key-value table
+- pack (split) separated keys and values into a new key-value table
 ```lua
     local table = teateatea.kvpack(str[, equal, separator, drop_empty, trim_whitespaces, multi_equal, multi_separators])
 ```
