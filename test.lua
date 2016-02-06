@@ -328,22 +328,24 @@ eqlkvTables(tea.kvpack("a b c d x  y  notbroken 12345 12345", " ", " ?", true, n
 }, "only*space; same keys");
 ok(); -- 39
 
-eqlkvTables(tea.kvpack("a=EQL!b;c=EQL!d,x=EQL! y ;empty=EQL!!empty2!!12345=EQL!12345", "=EQL!", ";,=!", nil, nil, nil, true), {
+eqlkvTables(tea.kvpack("a=EQL!b;c=EQL!d,x=EQL! y ;empty=EQL!!empty2!!empty3=12345=EQL!12345", "=EQL!", ";,=!", nil, nil, nil, true), {
 	["a"] = "b";
 	["c"] = "d";
 	["x"] = " y ";
 	["empty"] = "";
 	["empty2"] = "";
+	["empty3"] = "";
 	["12345"]="12345";
 }, "';'");
 ok(); -- 40
 
-eqlkvTables(tea.kvpack("aEQLb;cEQLd,xEQL y ;emptyEQL!empty2!!12345EQL12345", "EQL", ";,!=", nil, nil, nil, true), {
+eqlkvTables(tea.kvpack("aEQLb;cEQLd,xEQL y ;emptyEQL!empty2!!empty3!12345EQL12345", "EQL", ";,!=", nil, nil, nil, true), {
 	["a"] = "b";
 	["c"] = "d";
 	["x"] = " y ";
 	["empty"] = "";
 	["empty2"] = "";
+	["empty3"] = "";
 	["12345"]="12345";
 }, "';'");
 ok(); -- 40
@@ -357,22 +359,24 @@ eqlkvTables(tea.kvpack("a b c d x  y  notbroken!12345 12345", " !", " ", true, n
 }, "only*space; same keys");
 ok(); -- 42
 
-eqlkvTables(tea.kvpack("a=b=EQL+c+d=EQL+x- y =EQL+empty==EQL+empty2=EQL+=EQL+12345=12345", "=-+", "=EQL+", nil, nil, true), {
+eqlkvTables(tea.kvpack("a=b=EQL+c+d=EQL+x- y =EQL+empty==EQL+empty2=EQL+=EQL+empty3=EQL+12345=12345", "=-+", "=EQL+", nil, nil, true), {
 	["a"] = "b";
 	["c"] = "d";
 	["x"] = " y ";
 	["empty"] = "";
 	["empty2"] = "";
+	["empty3"] = "";
 	["12345"]="12345";
 }, "';'");
 ok(); -- 43
 
-eqlkvTables(tea.kvpack("a=bEQLc+dEQLx- y EQLempty=EQLempty2EQLEQL12345=12345", "=-+", "EQL", nil, nil, true), {
+eqlkvTables(tea.kvpack("a=bEQLc+dEQLx- y EQLempty=EQLempty2EQLEQLempty3EQL12345=12345", "=-+", "EQL", nil, nil, true), {
 	["a"] = "b";
 	["c"] = "d";
 	["x"] = " y ";
 	["empty"] = "";
 	["empty2"] = "";
+	["empty3"] = "";
 	["12345"]="12345";
 }, "';'");
 ok(); -- 44

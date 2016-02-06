@@ -14,7 +14,7 @@
 #define TEA_PACK_SP_DEFAULT ';'
 
 
-#define TEA_PACK_SEEK_WORD_KEY_END(k, i, m, s, l, eq, eql, sp, spl)\
+#define TEA_PACK_SEEK_WORD_KEY_END(k, i, m, nv, s, l, eq, eql, sp, spl)\
 	m = 0;\
 	while(i < l) {\
 		if (s[i] == eq[0]) {\
@@ -27,7 +27,7 @@
 		if (s[i] == sp[0]) {\
 			++i;\
 			while(i < l && ++m < spl && s[i] == sp[m]) ++i;\
-			if (m >= spl) { i-= m; m = 0; break; }\
+			if (m >= spl) { nv = 1; break; }\
 			m = 0;\
 		} else {\
 			++i;\
@@ -93,13 +93,13 @@
 	}\
 	k = i - m;
 
-#define TEA_PACK_SEEK_MULTI_WORD_KEY_END_REVERSE(k, i, m, s, l, sp, spl, eqd)\
+#define TEA_PACK_SEEK_MULTI_WORD_KEY_END_REVERSE(k, i, m, nv, s, l, sp, spl, eqd)\
 	m = 0;\
 	while(i < l) {\
 		if (s[i] == sp[0]) {\
 			++i;\
 			while(i < l && ++m < spl && s[i] == sp[m]) ++i;\
-			if (m >= spl) break;\
+			if (m >= spl) { nv = 1; break; }\
 			i-= m;\
 			m = 0;\
 		}\

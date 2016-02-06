@@ -58,21 +58,26 @@ static int pack_kv_word(struct tea_tcursor_kv *tab, char flag, const char *str, 
 	size_t i;
 
 	char empty = !(flag & TEA_PACK_FLAG_IGNORE_EMPTY);
-
 	char trim = flag & TEA_PACK_FLAG_SPACE_TRIM;
+	char eq_override = 0;
 
 	for(i = 0; i < len;) {
 		// key: begin
 		key_begin = i;
 
 		// key: end
-		TEA_PACK_SEEK_WORD_KEY_END(key_end, i, match, str, len, eq, eql, sp, spl);
+		TEA_PACK_SEEK_WORD_KEY_END(key_end, i, match, eq_override, str, len, eq, eql, sp, spl);
 
 		// value: begin
 		value_begin = i;
 
 		// value: end
-		TEA_PACK_SEEK_WORD_VALUE_END(value_end, i, match, str, len, sp, spl);
+		if (eq_override) { // eq token override?
+			value_end = i;
+			eq_override = 0;
+		} else {
+			TEA_PACK_SEEK_WORD_VALUE_END(value_end, i, match, str, len, sp, spl);
+		}
 
 		// capture
 		if (trim) {
@@ -155,19 +160,25 @@ static int pack_kv_multi_key(struct tea_tcursor_kv *tab, char flag, const char *
 
 	char empty = !(flag & TEA_PACK_FLAG_IGNORE_EMPTY);
 	char trim = flag & TEA_PACK_FLAG_SPACE_TRIM;
+	char eq_override = 0;
 
 	for(i = 0; i < len;) {
 		// key: begin
 		key_begin = i;
 
 		// key: end
-		TEA_PACK_SEEK_MULTI_WORD_KEY_END_REVERSE(key_end, i, match, str, len, sp, spl, eq_dict);
+		TEA_PACK_SEEK_MULTI_WORD_KEY_END_REVERSE(key_end, i, match, eq_override, str, len, sp, spl, eq_dict);
 
 		// value: begin
 		value_begin = i;
 
 		// value: end
-		TEA_PACK_SEEK_MULTI_WORD_VALUE_END(value_end, i, match, str, len, sp, spl);
+		if (eq_override) { // eq token override?
+			value_end = i;
+			eq_override = 0;
+		} else {
+			TEA_PACK_SEEK_MULTI_WORD_VALUE_END(value_end, i, match, str, len, sp, spl);
+		}
 
 		// capture
 		if (trim) {
