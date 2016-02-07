@@ -282,7 +282,7 @@ int tea_pack_kv(lua_State *l, char flag, const char *str, size_t len, const char
 	}
 
 	if (stat) {
-		luaL_error(l, "unable to perform key-value pack string '%s'", str);
+		luaL_error(l, "unable to perform a %s pack (code: %d)", "key-value", stat);
 	}
 
 	tea_tcursor_kv_dump(l, &tab);
@@ -415,7 +415,7 @@ int tea_pack(lua_State *l, char flag, const char *str, size_t len, const char *s
 	}
 
 	if (stat) {
-		luaL_error(l, "unable to perform key pack string '%s'", str);
+		luaL_error(l, "unable to perform a %s pack (code: %d)", "key", stat);
 	}
 
 	tea_tcursor_dump(l, &tab);
