@@ -1,6 +1,9 @@
-SRC=tea_tcursor.c tea_pack.c teateatea.c
+SOURCES=tea_tcursor.c tea_pack.c teateatea.c
 TARGET=teateatea.so
 TESTFILE=test.lua
+
+SRCDIR=src
+OBJDIR=obj
 
 ifdef LUAPKG
 	PREFIX=$(shell pkg-config --variable=prefix $(LUAPKG))
@@ -16,23 +19,30 @@ endif
 
 CCOPT=-O3 -Wall -fPIC $(CFLAGS) $(LUAINC)
 LDOPT=-shared $(LDFLAGS)
-OBJ=$(SRC:.c=.o)
 CHMOD=755
+
+SRC=$(addprefix $(SRCDIR)/, $(SOURCES))
+OBJ=$(addprefix $(OBJDIR)/, $(SOURCES:.c=.o))
 
 ifeq ($(CC), clang)
 	LDOPT+= -undefined dynamic_lookup
 endif
 
-all: $(SRC) $(TARGET)
+
+all: $(TARGET)
+
+obj:
+	mkdir obj
 
 $(TARGET): $(OBJ)
 	$(CC) $(LDOPT) $(OBJ) -o $@
 
-.c.o:
+$(OBJDIR)/%.o: $(SRCDIR)/%.c obj
 	$(CC) -c $(CCOPT) $< -o $@
 
 clean:
-	rm -f $(TARGET) $(OBJ)
+	rm -rf $(OBJDIR)
+	rm -f $(TARGET)
 
 install: $(TARGET)
 	mkdir -p $(LUALIBDIR)

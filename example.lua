@@ -2,7 +2,7 @@ local tea = require "teateatea";
 
 --[[
 	local tab = tea.pack(str[, separator, drop_empty, trim_whitespaces, multi_separators]);
-	local tab = tea.kvpack(str[, equal, separator, drop_empty, trim_whitespaces, multi_sep_equal]);
+	local tab = tea.kvpack(str[, equal, separator, drop_empty, trim_whitespaces, multi_equal, multi_separators]);
 	local trimed_str = tea.trim(str);
 ]]
 
