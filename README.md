@@ -1,6 +1,6 @@
 # TEATEATEA
 
-<b>Teh Lua Lib, that provides easy way to do some stuff with strings:</b>
+<b>Teh Lua Lib, that provides you an easy way to do some stuff with strings:</b>
 
 - pack (split) separated values into a new array table
 ```lua

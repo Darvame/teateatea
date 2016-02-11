@@ -32,7 +32,7 @@ endif
 all: $(TARGET)
 
 obj:
-	mkdir obj
+	mkdir -p obj
 
 $(TARGET): $(OBJ)
 	$(CC) $(LDOPT) $(OBJ) -o $@
