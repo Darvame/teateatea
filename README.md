@@ -60,5 +60,5 @@ export CC=clang #if build on osx
 <h3>Building & Installing:</h3>
 
 ```bash
-make && make install
+make install
 ```
