@@ -4,8 +4,18 @@ local tea = require "teateatea";
 	local tab = tea.pack(str[, separator, drop_empty, trim_whitespaces, multi_separators]);
 	local tab = tea.kvpack(str[, equal, separator, drop_empty, trim_whitespaces, multi_equal, multi_separators]);
 	local trimed_str = tea.trim(str);
-]]
 
+	where:
+	str = "string" or metatable.__tostring result (for table and userdata only)
+	separator = "string" (separator token)
+	equal = "string" (equal token)
+
+	drop_empty = boolean (don't push empty values)
+	trim_whitespaces = boolean (trim whitespaces before pushing)
+	multi_separators = boolean (use the separator value as a collection of 1 byte separator tokens) UTF-8 (2 bytes and more) is unsupported
+	multi_equal = boolean (use the equal value as a collection of 1 byte equal tokens) UTF-8 (2 bytes and more) is unsupported
+
+]]
 
 -- *** basic:
 
@@ -214,7 +224,9 @@ local packed_cookie = tea.kvpack(cookie, "=", ";", true, true); -- ignore empty 
 local index = getmetatable("").__index;
 
 for k, v in next, (require"teateatea") do
-	index[k] = v;
+	if (type(v) == "function") then
+		index[k] = v;
+	end
 end
 
 -- and now
@@ -230,7 +242,7 @@ local tab = ("a|b|c|d"):pack("|");
 	}
 ]]
 
--- or trim string
+-- or trim a string
 
 local str = ("   TRIMED       "):trim();
 

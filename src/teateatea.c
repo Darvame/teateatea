@@ -115,6 +115,7 @@ static int trim(lua_State *l)
 }
 
 static const luaL_Reg api_list[] = {
+
 	{"kvpack", pack_kv},
 	{"pack", pack},
 	{"trim", trim},
@@ -133,6 +134,10 @@ int luaopen_teateatea(lua_State *l)
 		lua_pushcfunction(l, api->func);
 		lua_rawset(l, -3);
 	}
+
+	lua_pushstring(l, "_VERSION");
+	lua_pushnumber(l, 100);
+	lua_rawset(l, -3);
 
 	return 1;
 }

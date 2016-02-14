@@ -1,4 +1,5 @@
 #include "lua.h"
+#include "limits.h"
 
 #define TEA_PACK_FLAG_KEY_MULTI 0x1
 #define TEA_PACK_FLAG_VALUE_MULTI 0x2
@@ -8,7 +9,7 @@
 #define TEA_PACK_FLAG_SPACE_TRIM 0x8
 #define TEA_PACK_FLAG_MULTI 0x10
 
-#define TEA_PACK_MULTI_DICT_SIZE 128
+#define TEA_PACK_MULTI_DICT_SIZE (UCHAR_MAX + 1)
 
 #define TEA_PACK_EQ_DEFAULT '='
 #define TEA_PACK_SP_DEFAULT ';'
@@ -61,11 +62,10 @@
 
 #define TEA_PACK_MULTI_DICT_INIT(d, i, s, l)\
 	for (i = 0; i < l; ++i)\
-		if (TEA_PACK_UCCHAR(s[i]) < TEA_PACK_MULTI_DICT_SIZE)\
-			d[TEA_PACK_UCCHAR(s[i])] = 1;
+		d[TEA_PACK_UCCHAR(s[i])] = 1;
 
 #define TEA_PACK_MULTI_INDICT(d, c)\
-	(TEA_PACK_UCCHAR(c) < TEA_PACK_MULTI_DICT_SIZE && d[TEA_PACK_UCCHAR(c)])
+	(d[TEA_PACK_UCCHAR(c)])
 
 #define TEA_PACK_SEEK_MULTI_KEYVALUE_END(k, i, s, l, eqd, spd)\
 	while((i < l) && !TEA_PACK_MULTI_INDICT(eqd, s[i]) && !TEA_PACK_MULTI_INDICT(spd, s[i])) ++i;\

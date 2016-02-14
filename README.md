@@ -48,8 +48,8 @@ export LUAPKG=lua5.2 #or any ('luajit', 'lua5.1', 'lua5.3')
 ```bash
 # this values are defaults (from luajit), do not set if have the same
 export PREFIX=/usr/local #prefix
-export LUALIBDIR=$PREFIX/lib/lua/5.1 #path to lua libs, used only for '$ make install'
-export LUAINC=-I$PREFIX/include/luajit-2.0 #path to lua headers
+export LUA_LIBDIR=$PREFIX/lib/lua/5.1 #path to lua libs, used only for '$ make install'
+export LUA_INCDIR=-I$PREFIX/include/luajit-2.0 #path to lua headers
 export LUA=$PREFIX/bin/luajit #lua executable, used only for '$ make test'
 ```
 - <b>with clang</b>
