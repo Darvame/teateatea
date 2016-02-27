@@ -2,18 +2,18 @@ local tea = require "teateatea";
 
 --[[
 	local tab = tea.pack(str[, separator, drop_empty, trim_whitespaces, multi_separators]);
-	local tab = tea.kvpack(str[, equal, separator, drop_empty, trim_whitespaces, multi_equal, multi_separators]);
+	local tab = tea.kvpack(str[, equals, separator, drop_empty, trim_whitespaces, multi_equals, multi_separators]);
 	local trimed_str = tea.trim(str);
 
 	where:
 	str = "string" or metatable.__tostring result (for table and userdata only)
-	separator = "string" (separator token)
-	equal = "string" (equal token)
+	separator = "string" (separation token)
+	equals = "string" (equals token)
 
 	drop_empty = boolean (don't push empty values)
 	trim_whitespaces = boolean (trim whitespaces before pushing)
-	multi_separators = boolean (use the separator value as a collection of 1 byte separator tokens) UTF-8 (2 bytes and more) is unsupported
-	multi_equal = boolean (use the equal value as a collection of 1 byte equal tokens) UTF-8 (2 bytes and more) is unsupported
+	multi_separators = boolean (use the separator value as a collection of 1 byte separation tokens) UTF-8 (2 bytes and more) is unsupported
+	multi_equals = boolean (use the equals value as a collection of 1 byte equals tokens) UTF-8 (2 bytes and more) is unsupported
 
 ]]
 
@@ -104,7 +104,7 @@ local tab = tea.pack(str, ";! ", nil, true, true); -- 5th arg goes true (now usi
 
 local str = "key1=value1;key2=value2;key3=value3";
 
-local tab = tea.kvpack(str); -- default separator is ';', default equal char is '='
+local tab = tea.kvpack(str); -- default separator is ';', default equals char (equals token) is '='
 local tab = tea.kvpack(str, "=", ";"); -- doing the same
 
 --[[
