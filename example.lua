@@ -6,9 +6,9 @@ local tea = require "teateatea";
 	local trimed_str = tea.trim(str);
 
 	where:
-	str = "string" or metatable.__tostring result (for table and userdata only)
-	separator = "string" (separation token)
-	equals = "string" (equals token)
+	str = "string" or metatable.__tostring result (for table and userdata only) (target string)
+	separator = "string" or metatable.__tostring result (for table and userdata only) (separation token)
+	equals = "string" or metatable.__tostring result (for table and userdata only) (equals token)
 
 	drop_empty = boolean (don't push empty values)
 	trim_whitespaces = boolean (trim whitespaces before pushing)

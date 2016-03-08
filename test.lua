@@ -382,6 +382,7 @@ eqlkvTables(tea.kvpack("a=bEQLc+dEQLx- y EQLempty=EQLempty2EQLEQLempty3EQL12345=
 }, "';'");
 ok(); -- 45
 
+crunning = "empty";
 eqlkvTables(tea.pack("1=2;3=4;"), {
 	"1=2;3=4;"
 }, "empty"); ok(); -- 46
@@ -394,6 +395,7 @@ eqlkvTables(tea.kvpack("1=2;3=4;", nil, nil, true), {
 
 }, "drop emptykv"); ok(); -- 48
 
+crunning = "meta other";
 eqlkvTables(tea.pack("1;2;3;4;", setmetatable({";"}, {__tostring = function(self) return self[1]; end})), {
 	'1', '2', '3', '4', '',
 }, "meta sep"); ok(); -- 49

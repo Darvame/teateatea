@@ -5,21 +5,22 @@
 #include "tea_tcursor.h"
 #include "tea_pack.h"
 
+#define utable_tostring(l, abs, argc) (utable(l, abs) && metatable_tostring(l, (abs - 1) - argc))
+
 static __inline__ int utable(lua_State *l, int obj)
 {
 	int type = lua_type(l, obj);
 	return (type == LUA_TTABLE || type == LUA_TUSERDATA);
 }
 
-static void metatable_tostring(lua_State *l, int obj)
+static int metatable_tostring(lua_State *l, int obj)
 {
 	if (luaL_callmeta(l, obj, "__tostring")) {
-		if (lua_isstring(l, -1)) {
-			lua_replace(l, obj - 1);
-		} else {
-			lua_pop(l, 1);
-		}
+		lua_replace(l, obj - 1);
+		return 1;
 	}
+
+	return 0;
 }
 
 static int pack_kv(lua_State *l)
@@ -45,22 +46,19 @@ static int pack_kv(lua_State *l)
 		case 3:
 			sp = lua_tolstring(l, 3, &spl);
 
-			if (!sp && utable(l, 3)) {
-				metatable_tostring(l, -argc + 2);
+			if (!sp && utable_tostring(l, 3, argc)) {
 				sp = lua_tolstring(l, 3, &spl);
 			}
 		case 2:
 			eq = lua_tolstring(l, 2, &eql);
 
-			if (!eq && utable(l, 2)) {
-				metatable_tostring(l, -argc + 1);
+			if (!eq && utable_tostring(l, 2, argc)) {
 				eq = lua_tolstring(l, 2, &eql);
 			}
 		case 1:
 			str = lua_tolstring(l, 1, &len);
 
-			if (!str && utable(l, 1)) {
-				metatable_tostring(l, -argc);
+			if (!str && utable_tostring(l, 1, argc)) {
 				str = lua_tolstring(l, 1, &len);
 			}
 	}
@@ -88,15 +86,13 @@ static int pack(lua_State *l)
 		case 2:
 			sp = lua_tolstring(l, 2, &spl);
 
-			if (!sp && utable(l, 2)) {
-				metatable_tostring(l, -argc + 1);
+			if (!sp && utable_tostring(l, 2, argc)) {
 				sp = lua_tolstring(l, 2, &spl);
 			}
 		case 1:
 			str = lua_tolstring(l, 1, &len);
 
-			if (!str && utable(l, 1)) {
-				metatable_tostring(l, -argc);
+			if (!str && utable_tostring(l, 1, argc)) {
 				str = lua_tolstring(l, 1, &len);
 			}
 	}
@@ -110,12 +106,12 @@ static int trim(lua_State *l)
 		lua_pop(l, lua_gettop(l) - 1);
 	}
 
-	if (utable(l, 1)) {
-		metatable_tostring(l, -1);
-	}
-
 	size_t len;
 	const char *str = lua_tolstring(l, 1, &len);
+
+	if (!str && utable_tostring(l, 1, 1)) { // argc==1 always here
+		str = lua_tolstring(l, 1, &len);
+	}
 
 	if(!str) {
 		lua_pushnil(l);
