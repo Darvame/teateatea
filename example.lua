@@ -1,8 +1,8 @@
 local tea = require "teateatea";
 
 --[[
-	local tab = tea.pack(str[, separator, drop_empty, trim_whitespaces, multi_separators]);
-	local tab = tea.kvpack(str[, equals, separator, drop_empty, trim_whitespaces, multi_equals, multi_separators]);
+	local tab = tea.pack(str, separator[, drop_empty, trim_whitespaces, multi_separators]);
+	local tab = tea.kvpack(str, equals, separator[, drop_empty, trim_whitespaces, multi_equals, multi_separators]);
 	local trimed_str = tea.trim(str);
 
 	where:
