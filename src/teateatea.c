@@ -5,13 +5,7 @@
 #include "tea_tcursor.h"
 #include "tea_pack.h"
 
-#define utable_tostring(l, abs, argc) (utable(l, abs) && metatable_tostring(l, (abs - 1) - argc))
-
-static __inline__ int utable(lua_State *l, int obj)
-{
-	int type = lua_type(l, obj);
-	return (type == LUA_TTABLE || type == LUA_TUSERDATA);
-}
+#define obj_from_top(abs, argc) ((abs - 1) - argc)
 
 static int metatable_tostring(lua_State *l, int obj)
 {
@@ -46,19 +40,19 @@ static int pack_kv(lua_State *l)
 		case 3:
 			sp = lua_tolstring(l, 3, &spl);
 
-			if (!sp && utable_tostring(l, 3, argc)) {
+			if (!sp && metatable_tostring(l, obj_from_top(3, argc))) {
 				sp = lua_tolstring(l, 3, &spl);
 			}
 		case 2:
 			eq = lua_tolstring(l, 2, &eql);
 
-			if (!eq && utable_tostring(l, 2, argc)) {
+			if (!eq && metatable_tostring(l, obj_from_top(2, argc))) {
 				eq = lua_tolstring(l, 2, &eql);
 			}
 		case 1:
 			str = lua_tolstring(l, 1, &len);
 
-			if (!str && utable_tostring(l, 1, argc)) {
+			if (!str && metatable_tostring(l, obj_from_top(1, argc))) {
 				str = lua_tolstring(l, 1, &len);
 			}
 	}
@@ -86,13 +80,13 @@ static int pack(lua_State *l)
 		case 2:
 			sp = lua_tolstring(l, 2, &spl);
 
-			if (!sp && utable_tostring(l, 2, argc)) {
+			if (!sp && metatable_tostring(l, obj_from_top(2, argc))) {
 				sp = lua_tolstring(l, 2, &spl);
 			}
 		case 1:
 			str = lua_tolstring(l, 1, &len);
 
-			if (!str && utable_tostring(l, 1, argc)) {
+			if (!str && metatable_tostring(l, obj_from_top(1, argc))) {
 				str = lua_tolstring(l, 1, &len);
 			}
 	}
@@ -109,7 +103,7 @@ static int trim(lua_State *l)
 	size_t len;
 	const char *str = lua_tolstring(l, 1, &len);
 
-	if (!str && utable_tostring(l, 1, 1)) { // argc==1 always here
+	if (!str && metatable_tostring(l, -1)) { // argc==1 always here
 		str = lua_tolstring(l, 1, &len);
 	}
 
