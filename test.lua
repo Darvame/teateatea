@@ -393,3 +393,12 @@ eqlkvTables(tea.kvpack("1=2;3=4;"), {
 eqlkvTables(tea.kvpack("1=2;3=4;", nil, nil, true), {
 
 }, "drop emptykv"); ok(); -- 48
+
+eqlkvTables(tea.pack("1;2;3;4;", setmetatable({";"}, {__tostring = function(self) return self[1]; end})), {
+	'1', '2', '3', '4', '',
+}, "meta sep"); ok(); -- 49
+
+eqlkvTables(tea.kvpack("1=2;3=4;", setmetatable({"="}, {__tostring = function(self) return self[1]; end}),
+setmetatable({";"}, {__tostring = function(self) return self[1]; end})), {
+	['1'] = '2'; ['3'] = '4';
+}, "meta eq sep"); ok(); -- 50

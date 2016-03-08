@@ -42,14 +42,27 @@ static int pack_kv(lua_State *l)
 		case 6: if (lua_toboolean(l, 6)) flag|= TEA_PACK_FLAG_KEY_MULTI;
 		case 5: if (lua_toboolean(l, 5)) flag|= TEA_PACK_FLAG_SPACE_TRIM;
 		case 4: if (lua_toboolean(l, 4)) flag|= TEA_PACK_FLAG_IGNORE_EMPTY;
-		case 3: sp = lua_tolstring(l, 3, &spl);
-		case 2: eq = lua_tolstring(l, 2, &eql);
-		case 1:
-			if (utable(l, 1)) {
-				metatable_tostring(l, -argc);
-			}
+		case 3:
+			sp = lua_tolstring(l, 3, &spl);
 
+			if (!sp && utable(l, 3)) {
+				metatable_tostring(l, -argc + 2);
+				sp = lua_tolstring(l, 3, &spl);
+			}
+		case 2:
+			eq = lua_tolstring(l, 2, &eql);
+
+			if (!eq && utable(l, 2)) {
+				metatable_tostring(l, -argc + 1);
+				eq = lua_tolstring(l, 2, &eql);
+			}
+		case 1:
 			str = lua_tolstring(l, 1, &len);
+
+			if (!str && utable(l, 1)) {
+				metatable_tostring(l, -argc);
+				str = lua_tolstring(l, 1, &len);
+			}
 	}
 
 	return tea_pack_kv(l, flag, str, len, eq, eql, sp, spl);
@@ -72,13 +85,20 @@ static int pack(lua_State *l)
 		case 5: if (lua_toboolean(l, 5)) flag|= TEA_PACK_FLAG_VALUE_MULTI;
 		case 4: if (lua_toboolean(l, 4)) flag|= TEA_PACK_FLAG_SPACE_TRIM;
 		case 3: if (lua_toboolean(l, 3)) flag|= TEA_PACK_FLAG_IGNORE_EMPTY;
-		case 2: sp = lua_tolstring(l, 2, &spl);
-		case 1:
-			if (utable(l, 1)) {
-				metatable_tostring(l, -argc);
-			}
+		case 2:
+			sp = lua_tolstring(l, 2, &spl);
 
+			if (!sp && utable(l, 2)) {
+				metatable_tostring(l, -argc + 1);
+				sp = lua_tolstring(l, 2, &spl);
+			}
+		case 1:
 			str = lua_tolstring(l, 1, &len);
+
+			if (!str && utable(l, 1)) {
+				metatable_tostring(l, -argc);
+				str = lua_tolstring(l, 1, &len);
+			}
 	}
 
 	return tea_pack(l, flag, str, len, sp, spl);
