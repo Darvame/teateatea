@@ -1,3 +1,6 @@
+#ifndef TEA_TCURSOR_H
+#define TEA_TCURSOR_H
+
 #include "lua.h"
 
 #define TEA_TCURSOR_WORKLOAD 128
@@ -53,3 +56,5 @@ struct tea_tcursor_kv {
 
 int tea_tcursor_kv_add(struct tea_tcursor_kv *, const char *, size_t, const char *, size_t);
 void tea_tcursor_kv_dump(lua_State *, struct tea_tcursor_kv *);
+
+#endif

@@ -60,5 +60,11 @@ export CC=clang #if build on osx
 <h3>Building & Installing:</h3>
 
 ```bash
+#to build and(or) install
 make install
+```
+
+```bash
+#to build only
+make
 ```

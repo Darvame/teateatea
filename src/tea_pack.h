@@ -1,3 +1,6 @@
+#ifndef TEA_PACK_H
+#define TEA_PACK_H
+
 #include "lua.h"
 #include "limits.h"
 
@@ -126,3 +129,5 @@
 
 int tea_pack_kv(lua_State *, char, const char *, size_t, const char *, size_t, const char *, size_t);
 int tea_pack(lua_State *, char, const char *, size_t, const char *, size_t);
+
+#endif
