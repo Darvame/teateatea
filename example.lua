@@ -21,8 +21,7 @@ local tea = require "teateatea";
 
 local str = "abc;bcd;qwety;;;lol";
 
-local tab = tea.pack(str); -- default separator is ';';
-local tab = tea.pack(str, ";"); -- doing the same
+local tab = tea.pack(str, ";"); -- split str into the array bellow
 
 --[[
 	tab = {
@@ -104,8 +103,7 @@ local tab = tea.pack(str, ";! ", nil, true, true); -- 5th arg goes true (now usi
 
 local str = "key1=value1;key2=value2;key3=value3";
 
-local tab = tea.kvpack(str); -- default separator is ';', default equals char (equals token) is '='
-local tab = tea.kvpack(str, "=", ";"); -- doing the same
+local tab = tea.kvpack(str, "=", ";"); -- split str into the key-value table bellow
 
 --[[
 	tab = {
@@ -133,7 +131,7 @@ local tab = tea.kvpack(str, "is equal", "and", false, true); -- use long sep/eq,
 
 local str = "key1-value1:key2=value2;key3?value3!";
 
-local tab = tea.kvpack(str, "=-?", ";:!", false, false, true, true); -- 6th (for eq) and 7th (for sep) args goes true
+local tab = tea.kvpack(str, "=-?", ";:!", false, false, true, true); -- 6th (for eq) and 7th (for sep) args go true
 
 --[[
 	tab = {

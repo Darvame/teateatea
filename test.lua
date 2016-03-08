@@ -75,11 +75,11 @@ do
 
 	t[#t+1] = '';
 
-	eqlTables(tea.pack(str), t);
+	eqlTables(tea.pack(str, ";"), t);
 end
 ok(); -- 0
 
-eqlTables(tea.pack("abc;i; ;;;*&;123;  -  ;last", nil, true), {
+eqlTables(tea.pack("abc;i; ;;;*&;123;  -  ;last", ";", true), {
 	"abc", "i", " ", "*&", "123", "  -  ", "last"
 }, "';'");
 ok(); -- 1
@@ -107,12 +107,12 @@ ok(); -- 5
 -- .pack_t
 crunning = "tpack";
 
-eqlTables(tea.pack("a b c; i; ; ;   ;*&; 123;  -  ;          last ;      ", nil, nil, true), {
+eqlTables(tea.pack("a b c; i; ; ;   ;*&; 123;  -  ;          last ;      ", ";", nil, true), {
 	"a b c", "i", "", "", "", "*&", "123", "-", "last", ""
 }, ";");
 ok(); -- 6
 
-eqlTables(tea.pack(setmetatable({}, { __tostring = function() return "a b c; i; ; ;   ;*&; 123;  -  ;          last ;      " end }), nil, true, true), {
+eqlTables(tea.pack(setmetatable({}, { __tostring = function() return "a b c; i; ; ;   ;*&; 123;  -  ;          last ;      " end }), ";", true, true), {
 	"a b c", "i", "*&", "123", "-", "last"
 }, "; meta");
 ok(); -- 7
@@ -158,7 +158,7 @@ ok(); -- 14
 -- .pack_mt
 crunning = "mtpack";
 
-eqlTables(tea.pack("a b c; i; ; ;   ;*&; 123;  -  ;          last ;      ", nil, true, true, true), {
+eqlTables(tea.pack("a b c; i; ; ;   ;*&; 123;  -  ;          last ;      ", ";", true, true, true), {
 	"a b c", "i", "*&", "123", "-", "last"
 }, ";");
 ok(); -- 15
@@ -181,7 +181,7 @@ ok(); -- 18
 -- .pack_kv
 crunning = "kvpack";
 
-eqlkvTables(tea.kvpack("a=b;c=d;x= y ;empty;12345=12345"), {
+eqlkvTables(tea.kvpack("a=b;c=d;x= y ;empty;12345=12345", "=", ";"), {
 	["a"] = "b";
 	["c"] = "d";
 	["x"] = " y ";
@@ -197,7 +197,7 @@ eqlkvTables(tea.kvpack("a b c d x  y  notbroken 12345 12345", " ", " ", true), {
 }, "only*space; same keys");
 ok(); -- 20
 
-eqlkvTables(tea.kvpack("key1=value1&key2=value2&key3=value3&key4=value4&", nil, "&"), {
+eqlkvTables(tea.kvpack("key1=value1&key2=value2&key3=value3&key4=value4&", "=", "&"), {
 	["key1"] = "value1";
 	["key2"] = "value2";
 	["key3"] = "value3";
@@ -217,7 +217,7 @@ ok(); -- 22
 -- .pack_tkv
 crunning = "tkvpack";
 
-eqlkvTables(tea.kvpack("a=b;c=d;x= y ;empty     ;   ;1234 5 =12345   ;", nil, nil, nil, true), {
+eqlkvTables(tea.kvpack("a=b;c=d;x= y ;empty     ;   ;1234 5 =12345   ;", "=", ";", nil, true), {
 	["a"] = "b";
 	["c"] = "d";
 	["x"] = "y";
@@ -226,7 +226,7 @@ eqlkvTables(tea.kvpack("a=b;c=d;x= y ;empty     ;   ;1234 5 =12345   ;", nil, ni
 }, "';'");
 ok(); -- 23
 
-eqlkvTables(tea.kvpack(setmetatable({}, { __tostring = function() return "a=b;c=d;x= y ;empty     ;  ;1234 5 =12345   ;" end }), nil, nil, nil, true), {
+eqlkvTables(tea.kvpack(setmetatable({}, { __tostring = function() return "a=b;c=d;x= y ;empty     ;  ;1234 5 =12345   ;" end }), "=", ";", nil, true), {
 	["a"] = "b";
 	["c"] = "d";
 	["x"] = "y";
@@ -242,7 +242,7 @@ eqlkvTables(tea.kvpack("a b c d x  y  notbroken 12345 12345", " ", " ", true, tr
 }, "only*space; same keys");
 ok(); -- 25
 
-eqlkvTables(tea.kvpack("key1=value1&    key2=value2&key3=value3&key4=value4&&&&&&&&&&&&&&&&", nil, "&", nil, true), {
+eqlkvTables(tea.kvpack("key1=value1&    key2=value2&key3=value3&key4=value4&&&&&&&&&&&&&&&&", "=", "&", nil, true), {
 	["key1"] = "value1";
 	["key2"] = "value2";
 	["key3"] = "value3";
@@ -280,7 +280,7 @@ ok(); -- 29
 -- .pack_mtkv
 crunning = "mtkvpack";
 
-eqlkvTables(tea.kvpack("a=b;c=d,x= y ;empty!     ! 1234 5 =12345   ?", nil, "!;,?", nil, true, true, true), {
+eqlkvTables(tea.kvpack("a=b;c=d,x= y ;empty!     ! 1234 5 =12345   ?", "=", "!;,?", nil, true, true, true), {
 	["a"] = "b";
 	["c"] = "d";
 	["x"] = "y";
@@ -299,7 +299,7 @@ eqlkvTables(tea.kvpack("a=b;c=d,x- y ;empty-        !broken     ! 1234 5 =12345 
 }, "!;,?|=-");
 ok(); -- 31
 
-eqlkvTables(tea.kvpack(setmetatable({}, { __tostring = function() return "a=b;c=d;x= y ;empty     ; 1234 5 =12345   ;" end }), nil, nil, nil, true, true, true), {
+eqlkvTables(tea.kvpack(setmetatable({}, { __tostring = function() return "a=b;c=d;x= y ;empty     ; 1234 5 =12345   ;" end }), "=", ';', nil, true, true, true), {
 	["a"] = "b";
 	["c"] = "d";
 	["x"] = "y";
@@ -381,3 +381,15 @@ eqlkvTables(tea.kvpack("a=bEQLc+dEQLx- y EQLempty=EQLempty2EQLEQLempty3EQL12345=
 	["12345"]="12345";
 }, "';'");
 ok(); -- 45
+
+eqlkvTables(tea.pack("1=2;3=4;"), {
+	"1=2;3=4;"
+}, "empty"); ok(); -- 46
+
+eqlkvTables(tea.kvpack("1=2;3=4;"), {
+	["1=2;3=4;"] = "";
+}, "emptykv"); ok(); -- 47
+
+eqlkvTables(tea.kvpack("1=2;3=4;", nil, nil, true), {
+
+}, "drop emptykv"); ok(); -- 48
