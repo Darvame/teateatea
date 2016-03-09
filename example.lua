@@ -1,8 +1,8 @@
 local tea = require "teateatea";
 
 --[[
-	local tab = tea.pack(str, separator[, drop_empty, trim_whitespaces, multi_separators]);
-	local tab = tea.kvpack(str, equals, separator[, drop_empty, trim_whitespaces, multi_equals, multi_separators]);
+	local tab = tea.pack(str, separator[, drop_empty, trim_value_whitespaces, multi_separators]);
+	local tab = tea.kvpack(str, equals, separator[, drop_empty, trim_key_whitespaces, trim_value_whitespaces, multi_equals, multi_separators]);
 	local trimed_str = tea.trim(str);
 
 	where:
@@ -11,7 +11,8 @@ local tea = require "teateatea";
 	equals = "string" or metatable.__tostring result (equals token)
 
 	drop_empty = boolean (don't push empty values)
-	trim_whitespaces = boolean (trim whitespaces before pushing)
+	trim_key_whitespaces = boolean (trim whitespaces from key before pushing)
+	trim_value_whitespaces = boolean (trim whitespaces from value before pushing)
 	multi_separators = boolean (use the separator value as a collection of 1 byte separation tokens) UTF-8 (2 bytes and more) is unsupported
 	multi_equals = boolean (use the equals value as a collection of 1 byte equals tokens) UTF-8 (2 bytes and more) is unsupported
 
@@ -117,7 +118,7 @@ local tab = tea.kvpack(str, "=", ";"); -- split str into the key-value table bel
 
 local str = "key1 is equal value1 and key2 is equal value2 and key3 is equal value3";
 
-local tab = tea.kvpack(str, "is equal", "and", false, true); -- use long sep/eq, trim whitespaces
+local tab = tea.kvpack(str, "is equal", "and", false, true, true); -- use multichar sep/eq, trim whitespaces
 
 --[[
 	tab = {
@@ -131,7 +132,7 @@ local tab = tea.kvpack(str, "is equal", "and", false, true); -- use long sep/eq,
 
 local str = "key1-value1:key2=value2;key3?value3!";
 
-local tab = tea.kvpack(str, "=-?", ";:!", false, false, true, true); -- 6th (for eq) and 7th (for sep) args go true
+local tab = tea.kvpack(str, "=-?", ";:!", false, false, false, true, true); -- 7th (for eq) and 8th (for sep) args go true
 
 --[[
 	tab = {
@@ -143,7 +144,7 @@ local tab = tea.kvpack(str, "=-?", ";:!", false, false, true, true); -- 6th (for
 
 local str = "key1=value1:key2=value2;key3=value3!";
 
-local tab = tea.kvpack(str, "=", ";:!", false, false, false, true); -- only 7th goes true, if using multiple separators
+local tab = tea.kvpack(str, "=", ";:!", false, false, false, false, true); -- only 8th goes true, if using multiple separators
 
 --[[
 	tab = {
@@ -157,7 +158,7 @@ local tab = tea.kvpack(str, "=", ";:!", false, false, false, true); -- only 7th 
 
 local str = "key1=value1;;;;;=broken;   =broken_trimed_key; key2 = value2; key3=;key4";
 
-local tab = tea.kvpack(str, "=", ";", false, true); -- trim whitespaces
+local tab = tea.kvpack(str, "=", ";", false, true, true); -- trim whitespaces
 
 --[[
 	tab = {
@@ -168,11 +169,27 @@ local tab = tea.kvpack(str, "=", ";", false, true); -- trim whitespaces
 	}
 ]]
 
+--- *** trim only keys
+
+local str = " key1   = value1 ;      key2 =       value2; key3   =    ; key4 =     ;";
+
+local tab = tea.kvpack(str, "=", ";", false, true, false); -- trim whitespaces only from keys
+
+--[[
+	tab = {
+		["key1"] = " value1 ",
+		["key2"] = "       value2",
+		["key3"] = "    ",
+		["key4"] = "     ",
+	}
+]]
+
+
 --- *** drop empty values
 
 local str = "key1=value1;=broken;   =broken_trimed_key; key2 = value2; key3=;key4";
 
-local tab = tea.kvpack(str, "=", ";", true, true); -- also ignore empty
+local tab = tea.kvpack(str, "=", ";", true, true, true); -- also ignore empty
 
 --[[
 	tab = {
@@ -207,7 +224,7 @@ local tab = tea.kvpack(str, "=", ";");
 
 local cookie = "cookie1=value1; cookie2=value2; cookie3=value3";
 
-local packed_cookie = tea.kvpack(cookie, "=", ";", true, true); -- ignore empty values and trim whitespaces
+local packed_cookie = tea.kvpack(cookie, "=", ";", true, true, true); -- ignore empty values and trim whitespaces
 
 --[[
 	packed_cookie = {

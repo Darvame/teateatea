@@ -4,11 +4,11 @@
 
 - pack (split) separated values into a new array table
 ```lua
-    local table = teateatea.pack(str, separator[, ignore_empty, trim_whitespaces, multi_separators])
+    local table = teateatea.pack(str, separator[, drop_empty, trim_value_whitespaces, multi_separators]);
 ```
 - pack (split) separated keys and values into a new key-value table
 ```lua
-    local table = teateatea.kvpack(str, equals, separator[, drop_empty, trim_whitespaces, multi_equals, multi_separators])
+    local table = teateatea.kvpack(str, equals, separator[, drop_empty, trim_key_whitespaces, trim_value_whitespaces, multi_equals, multi_separators]);
 ```
 - trim whitespaces
 ```lua

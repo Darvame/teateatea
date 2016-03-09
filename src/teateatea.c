@@ -31,11 +31,12 @@ static int pack_kv(lua_State *l)
 
 	char flag = 0;
 
-	switch (argc < 8 ? argc : 8) {
-		case 8: lua_pop(l, argc - 7); argc = 7;
-		case 7: if (lua_toboolean(l, 7)) flag|= TEA_PACK_FLAG_VALUE_MULTI;
-		case 6: if (lua_toboolean(l, 6)) flag|= TEA_PACK_FLAG_KEY_MULTI;
-		case 5: if (lua_toboolean(l, 5)) flag|= TEA_PACK_FLAG_SPACE_TRIM;
+	switch (argc < 9 ? argc : 9) {
+		case 9: lua_pop(l, argc - 8); argc = 8;
+		case 8: if (lua_toboolean(l, 8)) flag|= TEA_PACK_FLAG_VALUE_MULTI;
+		case 7: if (lua_toboolean(l, 7)) flag|= TEA_PACK_FLAG_KEY_MULTI;
+		case 6: if (lua_toboolean(l, 6)) flag|= TEA_PACK_FLAG_SPACE_TRIM_VALUE;
+		case 5: if (lua_toboolean(l, 5)) flag|= TEA_PACK_FLAG_SPACE_TRIM_KEY;
 		case 4: if (lua_toboolean(l, 4)) flag|= TEA_PACK_FLAG_IGNORE_EMPTY;
 		case 3:
 			sp = lua_tolstring(l, 3, &spl);
@@ -75,7 +76,7 @@ static int pack(lua_State *l)
 	switch (argc < 6 ? argc : 6) {
 		case 6: lua_pop(l, argc - 5); argc = 5;
 		case 5: if (lua_toboolean(l, 5)) flag|= TEA_PACK_FLAG_VALUE_MULTI;
-		case 4: if (lua_toboolean(l, 4)) flag|= TEA_PACK_FLAG_SPACE_TRIM;
+		case 4: if (lua_toboolean(l, 4)) flag|= TEA_PACK_FLAG_SPACE_TRIM_VALUE;
 		case 3: if (lua_toboolean(l, 3)) flag|= TEA_PACK_FLAG_IGNORE_EMPTY;
 		case 2:
 			sp = lua_tolstring(l, 2, &spl);
