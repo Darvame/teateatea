@@ -3,8 +3,8 @@
 #include "tea_tcursor.h"
 #include "tea_pack.h"
 
-static const char pack_eq_default[] = {TEA_PACK_EQ_DEFAULT};
-static const char pack_sp_default[] = {TEA_PACK_SP_DEFAULT};
+static const char pack_eq_default[] = TEA_PACK_EQ_DEFAULT;
+static const char pack_sp_default[] = TEA_PACK_SP_DEFAULT;
 
 static int pack_kv_char(struct tea_tcursor_kv *tab, char flag, const char *str, size_t len, const char eq, const char sp)
 {
@@ -273,14 +273,19 @@ int tea_pack_kv(lua_State *l, char flag, const char *str, size_t len, const char
 
 	int stat;
 
-	if(eql < 2 && spl < 2) { // single key and value seps
-		stat = pack_kv_char(&tab, flag, str, len,
-			eql > 0 ? eq[0] : TEA_PACK_EQ_DEFAULT,
-			spl > 0 ? sp[0] : TEA_PACK_SP_DEFAULT);
-	} else {
-		if(!eql) { eq = pack_eq_default; eql = 1; }
-		if(!spl) { sp = pack_sp_default; spl = 1; }
+	if (!eq) {
+		eq = pack_eq_default;
+		eql = TEA_PACK_EQ_DEFAULT_LEN;
+	}
 
+	if (!sp) {
+		sp = pack_sp_default;
+		spl = TEA_PACK_SP_DEFAULT_LEN;
+	}
+
+	if(eql < 2 && spl < 2) { // single key and value seps
+		stat = pack_kv_char(&tab, flag, str, len, *eq, *sp);
+	} else {
 		switch(flag & TEA_PACK_FLAG_KEYVALUE_MULTI) {
 			case TEA_PACK_FLAG_KEY_MULTI:
 				if (spl > 1)
@@ -422,11 +427,14 @@ int tea_pack(lua_State *l, char flag, const char *str, size_t len, const char *s
 
 	int stat;
 
-	if(spl < 2) {
-		stat = pack_char(&tab, flag, str, len, spl > 0 ? sp[0] : TEA_PACK_SP_DEFAULT);
-	} else {
-		if(!spl) { sp = pack_sp_default; spl = 1; }
+	if (!sp) {
+		sp = pack_sp_default;
+		spl = TEA_PACK_SP_DEFAULT_LEN;
+	}
 
+	if(spl < 2) {
+		stat = pack_char(&tab, flag, str, len, *sp);
+	} else {
 		if (flag & TEA_PACK_FLAG_VALUE_MULTI) {
 			stat = pack_multi(&tab, flag, str, len, sp, spl);
 		} else {

@@ -15,8 +15,11 @@
 
 #define TEA_PACK_MULTI_DICT_SIZE (UCHAR_MAX + 1)
 
-#define TEA_PACK_EQ_DEFAULT 0 // an empty string
-#define TEA_PACK_SP_DEFAULT 0 // an empty string
+#define TEA_PACK_EQ_DEFAULT "" // anything you want
+#define TEA_PACK_SP_DEFAULT "" // also modify the len bellow
+
+#define TEA_PACK_EQ_DEFAULT_LEN 0 // an empty string
+#define TEA_PACK_SP_DEFAULT_LEN 0 // an empty string
 
 
 #define TEA_PACK_SEEK_WORD_KEY_END(k, i, m, nv, s, l, eq, eql, sp, spl)\
