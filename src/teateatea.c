@@ -7,7 +7,7 @@
 
 #define obj_from_top(abs, argc) ((abs - 1) - argc)
 
-static int metatable_tostring(lua_State *l, int obj)
+static __inline__ int metatable_tostring(lua_State *l, int obj)
 {
 	if (luaL_callmeta(l, obj, "__tostring")) {
 		lua_replace(l, obj - 1);
