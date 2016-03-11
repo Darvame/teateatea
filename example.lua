@@ -22,7 +22,7 @@ local tea = require "teateatea";
 
 local str = "abc;bcd;qwety;;;lol";
 
-local tab = tea.pack(str, ";"); -- split str into the array bellow
+local tab = tea.pack(str, ";"); -- split the str value into the array bellow
 
 --[[
 	tab = {
@@ -56,7 +56,7 @@ local tab = tea.pack(str, "CUT");
 
 local str = "///abc/bcd/qwerty///////lastvalue//";
 
-local tab = tea.pack(str, "/", true); -- using custom separator, setting 3rd arg to 'true' (drop empty values)
+local tab = tea.pack(str, "/", true); -- using the custom separator '/', setting the 3rd arg to 'true' (drop empty values)
 
 --[[
 	tab = {
@@ -71,7 +71,7 @@ local tab = tea.pack(str, "/", true); -- using custom separator, setting 3rd arg
 
 local str = "one , two , three  , , foh  ";
 
-local tab = tea.pack(str, ",", nil, true); -- 4rd arg is true -> remove whitespaces before inserting
+local tab = tea.pack(str, ",", false, true); -- 4rd arg is true -> to remove any whitespaces before a value insertion
 
 --[[
 	tab = {
@@ -87,7 +87,7 @@ local tab = tea.pack(str, ",", nil, true); -- 4rd arg is true -> remove whitespa
 
 local str = "one; two! three foh";
 
-local tab = tea.pack(str, ";! ", nil, true, true); -- 5th arg goes true (now using multi/single char separators)
+local tab = tea.pack(str, ";! ", nil, true, true); -- 5th arg goes true (now using set of single char separators)
 
 --[[
 	tab = {
@@ -104,7 +104,7 @@ local tab = tea.pack(str, ";! ", nil, true, true); -- 5th arg goes true (now usi
 
 local str = "key1=value1;key2=value2;key3=value3";
 
-local tab = tea.kvpack(str, "=", ";"); -- split str into the key-value table bellow
+local tab = tea.kvpack(str, "=", ";"); -- split the str value into the key-value table bellow
 
 --[[
 	tab = {
@@ -114,11 +114,11 @@ local tab = tea.kvpack(str, "=", ";"); -- split str into the key-value table bel
 	}
 ]]
 
---- *** key-value big sep/eq:
+--- *** key-value long sep/eq:
 
 local str = "key1 is equal value1 and key2 is equal value2 and key3 is equal value3";
 
-local tab = tea.kvpack(str, "is equal", "and", false, true, true); -- use multichar sep/eq, trim whitespaces
+local tab = tea.kvpack(str, "is equal", "and", false, true, true); -- use long sep/eq, trim whitespaces
 
 --[[
 	tab = {
@@ -144,7 +144,7 @@ local tab = tea.kvpack(str, "=-?", ";:!", false, false, false, true, true); -- 7
 
 local str = "key1=value1:key2=value2;key3=value3!";
 
-local tab = tea.kvpack(str, "=", ";:!", false, false, false, false, true); -- only 8th goes true, if using multiple separators
+local tab = tea.kvpack(str, "=", ";:!", false, false, false, false, true); -- 8th goes true, if using a set of single char separators
 
 --[[
 	tab = {
@@ -158,7 +158,7 @@ local tab = tea.kvpack(str, "=", ";:!", false, false, false, false, true); -- on
 
 local str = "key1=value1;;;;;=broken;   =broken_trimed_key; key2 = value2; key3=;key4";
 
-local tab = tea.kvpack(str, "=", ";", false, true, true); -- trim whitespaces
+local tab = tea.kvpack(str, "=", ";", false, true, true); -- trim whitespaces (but do not drop empty values)
 
 --[[
 	tab = {
@@ -189,7 +189,7 @@ local tab = tea.kvpack(str, "=", ";", false, true, false); -- trim whitespaces o
 
 local str = "key1=value1;=broken;   =broken_trimed_key; key2 = value2; key3=;key4";
 
-local tab = tea.kvpack(str, "=", ";", true, true, true); -- also ignore empty
+local tab = tea.kvpack(str, "=", ";", true, true, true); -- also ignore empty values and trim both (keys and values)
 
 --[[
 	tab = {
@@ -198,7 +198,7 @@ local tab = tea.kvpack(str, "=", ";", true, true, true); -- also ignore empty
 	}
 ]]
 
---- *** metatable.__tostring support (only for tables and userdata):
+--- *** metatable.__tostring support:
 
 local str = setmetatable({
 	[1] = "key1=value1";
