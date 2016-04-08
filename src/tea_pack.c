@@ -1,7 +1,9 @@
 #include "lua.h"
 #include "lauxlib.h"
+
 #include "tea_tcursor.h"
 #include "tea_pack.h"
+#include "tea_trim.h"
 
 static const char pack_eq_default[] = TEA_PACK_EQ_DEFAULT;
 static const char pack_sp_default[] = TEA_PACK_SP_DEFAULT;

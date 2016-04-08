@@ -4,17 +4,27 @@
 
 #include "tea_tcursor.h"
 #include "tea_pack.h"
+#include "tea_trim.h"
 
-#define obj_from_top(abs, argc) ((abs - 1) - argc)
-
-static __inline__ int metatable_tostring(lua_State *l, int obj)
+static __inline__ int meta_tostring(lua_State *l, int obj)
 {
 	if (luaL_callmeta(l, obj, "__tostring")) {
-		lua_replace(l, obj - 1);
+		lua_replace(l, obj < 0 ? (obj - 1) : obj);
 		return 1;
 	}
 
 	return 0;
+}
+
+static __inline__ const char *tolstring(lua_State *l, int obj, size_t *len)
+{
+	const char *str = lua_tolstring(l, obj, len);
+
+	if (!str && meta_tostring(l, obj)) {
+		str = lua_tolstring(l, obj, len);
+	}
+
+	return str;
 }
 
 static int pack_kv(lua_State *l)
@@ -38,24 +48,9 @@ static int pack_kv(lua_State *l)
 		case 6: if (lua_toboolean(l, 6)) flag|= TEA_PACK_FLAG_SPACE_TRIM_VALUE;
 		case 5: if (lua_toboolean(l, 5)) flag|= TEA_PACK_FLAG_SPACE_TRIM_KEY;
 		case 4: if (lua_toboolean(l, 4)) flag|= TEA_PACK_FLAG_IGNORE_EMPTY;
-		case 3:
-			sp = lua_tolstring(l, 3, &spl);
-
-			if (!sp && metatable_tostring(l, obj_from_top(3, argc))) {
-				sp = lua_tolstring(l, 3, &spl);
-			}
-		case 2:
-			eq = lua_tolstring(l, 2, &eql);
-
-			if (!eq && metatable_tostring(l, obj_from_top(2, argc))) {
-				eq = lua_tolstring(l, 2, &eql);
-			}
-		case 1:
-			str = lua_tolstring(l, 1, &len);
-
-			if (!str && metatable_tostring(l, obj_from_top(1, argc))) {
-				str = lua_tolstring(l, 1, &len);
-			}
+		case 3: sp = tolstring(l, 3, &spl);
+		case 2: eq = tolstring(l, 2, &eql);
+		case 1: str = tolstring(l, 1, &len);
 	}
 
 	return tea_pack_kv(l, flag, str, len, eq, eql, sp, spl);
@@ -78,18 +73,8 @@ static int pack(lua_State *l)
 		case 5: if (lua_toboolean(l, 5)) flag|= TEA_PACK_FLAG_VALUE_MULTI;
 		case 4: if (lua_toboolean(l, 4)) flag|= TEA_PACK_FLAG_SPACE_TRIM_VALUE;
 		case 3: if (lua_toboolean(l, 3)) flag|= TEA_PACK_FLAG_IGNORE_EMPTY;
-		case 2:
-			sp = lua_tolstring(l, 2, &spl);
-
-			if (!sp && metatable_tostring(l, obj_from_top(2, argc))) {
-				sp = lua_tolstring(l, 2, &spl);
-			}
-		case 1:
-			str = lua_tolstring(l, 1, &len);
-
-			if (!str && metatable_tostring(l, obj_from_top(1, argc))) {
-				str = lua_tolstring(l, 1, &len);
-			}
+		case 2: sp = tolstring(l, 2, &spl);
+		case 1: str = tolstring(l, 1, &len);
 	}
 
 	return tea_pack(l, flag, str, len, sp, spl);
@@ -102,11 +87,7 @@ static int trim(lua_State *l)
 	}
 
 	size_t len;
-	const char *str = lua_tolstring(l, 1, &len);
-
-	if (!str && metatable_tostring(l, -1)) { // argc==1 always here
-		str = lua_tolstring(l, 1, &len);
-	}
+	const char *str = tolstring(l, 1, &len);
 
 	if(!str) {
 		lua_pushnil(l);

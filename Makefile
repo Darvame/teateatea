@@ -28,6 +28,9 @@ ifeq ($(CC), clang)
 	LDOPT+= -undefined dynamic_lookup
 endif
 
+ifdef TEA_TRIM_USE_CTYPE
+	CCOPT+= -DTEA_TRIM_USE_CTYPE
+endif
 
 all: build
 

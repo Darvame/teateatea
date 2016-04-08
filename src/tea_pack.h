@@ -118,17 +118,6 @@
 
 #define TEA_PACK_SEEK_MULTI_WORD_VALUE_END TEA_PACK_SEEK_WORD_VALUE_END
 
-#define TEA_PACK_WHILE_ISSPACE(w, c, modify)\
-	while(w) { switch(c) {\
-		case 0x9: case 0xA: case 0xB:\
-		case 0xC: case 0xD: case 0x20:\
-		modify; continue;\
-	} break; }
-
-#define TEA_PACK_SPACE_TRIM_WORD(s, b, e)\
-	TEA_PACK_WHILE_ISSPACE(e > b, s[b], ++b);\
-	TEA_PACK_WHILE_ISSPACE(e > b, s[e-1], --e);
-
 
 int tea_pack_kv(lua_State *, char, const char *, size_t, const char *, size_t, const char *, size_t);
 int tea_pack(lua_State *, char, const char *, size_t, const char *, size_t);
