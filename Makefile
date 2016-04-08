@@ -1,4 +1,5 @@
 SOURCES=tea_tcursor.c tea_pack.c teateatea.c
+HEADERS=tea_tcursor.h tea_pack.h tea_trim.h
 TARGET=teateatea.so
 TESTFILE=test.lua
 
@@ -22,6 +23,7 @@ LDOPT=-shared $(LDFLAGS)
 CHMOD=755
 
 SRC=$(addprefix $(SRCDIR)/, $(SOURCES))
+HDR=$(addprefix $(SRCDIR)/, $(HEADERS))
 OBJ=$(addprefix $(OBJDIR)/, $(SOURCES:.c=.o))
 
 ifeq ($(CC), clang)
@@ -39,7 +41,7 @@ build: $(TARGET)
 obj:
 	mkdir -p obj
 
-$(TARGET): $(OBJ)
+$(TARGET): $(HDR) $(OBJ)
 	$(CC) $(LDOPT) $(OBJ) -o $@
 
 $(OBJDIR)/%.o: $(SRCDIR)/%.c obj
