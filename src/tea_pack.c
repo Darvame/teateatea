@@ -8,6 +8,194 @@
 static const char pack_eq_default[] = TEA_PACK_EQ_DEFAULT;
 static const char pack_sp_default[] = TEA_PACK_SP_DEFAULT;
 
+//
+// SEEK
+//
+
+#define seek_multi_word_value_end seek_word_value_end
+
+static inline size_t seek_word_key_end(size_t *ip, char *eq_override, const char *str, size_t len, const char *eq, size_t eql, const char *sp, size_t spl)
+{
+	size_t match = 0;
+	size_t i = *ip;
+
+	while(i < len) {
+		if (str[i] == eq[0]) {
+			++i;
+
+			while(i < len && ++match < eql && str[i] == eq[match]) ++i;
+
+			if (match >= eql) break;
+
+			i-= match;
+			match = 0;
+	  	}
+
+		if (str[i] == sp[0]) {
+			++i;
+
+			while(i < len && ++match < spl && str[i] == sp[match]) ++i;
+
+			if (match >= spl) {
+				*eq_override = 1;
+				break;
+			}
+
+			match = 0;
+		} else {
+			++i;
+		}
+	}
+
+	*ip = i;
+
+	return i - match;
+}
+
+
+static inline size_t seek_word_value_end(size_t *ip, const char *str, size_t len, const char *sp, size_t spl)
+{
+	size_t match = 0;
+	size_t i = *ip;
+
+	while(i < len) {
+		if (str[i++] == sp[0]) {
+			while(++match < spl && i < len && str[i] == sp[match]) ++i;
+
+			if (match >= spl) {
+				*ip = i;
+				return i - match;
+			}
+
+			match = 0;
+		}
+	}
+
+	*ip = len + 1;
+
+	return len;
+}
+
+static inline size_t seek_key_end(size_t *ip, const char *str, size_t len, const char eq, const char sp)
+{
+	size_t i = *ip;
+
+	while((i < len) && (str[i] != eq) && (str[i] != sp)) ++i;
+
+	*ip = i + !(str[i] != eq);
+
+	return i;
+}
+
+static inline size_t seek_value_end(size_t *ip, const char *str, size_t len, const char sp)
+{
+	size_t i = *ip;
+
+	while((i < len) && (str[i] != sp)) ++i;
+
+	*ip = i + 1;
+
+	return i;
+}
+
+static inline void multi_dict_init(unsigned char *dict, unsigned const char *ustr, size_t len)
+{
+	size_t i;
+
+	for (i = 0; i < len; ++i) {
+		dict[ustr[i]] = 1;
+	}
+}
+
+static inline size_t seek_multi_keyvalue_end(size_t *ip, unsigned const char *ustr, size_t len, unsigned char *eqd, unsigned char *spd)
+{
+	size_t i = *ip;
+
+	while((i < len) && !eqd[ustr[i]] && !spd[ustr[i]]) ++i;
+
+	*ip = i + eqd[ustr[i]];
+
+	return i;
+}
+
+static inline size_t seek_multi_value_end(size_t *ip, unsigned const char *ustr, size_t len, unsigned char *spd)
+{
+	size_t i = *ip;
+
+	while((i < len) && !spd[ustr[i]]) ++i;
+
+	*ip = i + 1;
+
+	return i;
+}
+
+static inline size_t seek_multi_word_key_end(size_t *ip, const char *str, size_t len, const char *eq, size_t eql, unsigned char *spd)
+{
+	size_t match = 0;
+	size_t i = *ip;
+
+	while(i < len) {
+		if (str[i] == eq[0]) {
+			++i;
+
+			while(i < len && ++match < eql && str[i] == eq[match]) ++i;
+
+			if (match >= eql) {
+				*ip = i;
+				return i - match;
+			}
+
+			i-= match;
+			match = 0;
+		}
+
+		if (spd[(unsigned const char) str[i]]) break;
+
+		++i;
+	}
+
+	*ip = i;
+
+	return i;
+}
+
+static inline size_t seek_multi_word_key_end_reverse(size_t *ip, char *eq_override, const char *str, size_t len, const char *sp, size_t spl, unsigned char *eqd)
+{
+	size_t match = 0;
+	size_t i = *ip;
+
+	while(i < len) {
+		if (str[i] == sp[0]) {
+			++i;
+
+			while(i < len && ++match < spl && str[i] == sp[match]) ++i;
+
+			if (match >= spl) {
+				*eq_override = 1;
+				break;
+			}
+
+			i-= match;
+			match = 0;
+		}
+
+		if (eqd[(unsigned const char) str[i]]) {
+			*ip = i + 1;
+			return i;
+		}
+
+		++i;
+	}
+
+	*ip = i;
+
+	return i - match;
+}
+
+//
+// KV PACK
+//
+
 static int pack_kv_char(struct tea_tcursor_kv *tab, char flag, const char *str, size_t len, const char eq, const char sp)
 {
 	size_t key_begin;
@@ -25,13 +213,13 @@ static int pack_kv_char(struct tea_tcursor_kv *tab, char flag, const char *str, 
 		key_begin = i;
 
 		// key: end
-		TEA_PACK_SEEK_KEY_END(key_end, i, str, len, eq, sp)
+		key_end = seek_key_end(&i, str, len, eq, sp);
 
 		// value: begin
 		value_begin = i;
 
 		// value: end
-		TEA_PACK_SEEK_VALUE_END(value_end, i, str, len, sp)
+		value_end = seek_value_end(&i, str, len, sp);
 
 		// capture
 		if (trim_key) {
@@ -60,7 +248,6 @@ static int pack_kv_word(struct tea_tcursor_kv *tab, char flag, const char *str, 
 	size_t key_end;
 	size_t value_begin;
 	size_t value_end;
-	size_t match;
 	size_t i;
 
 	char empty = !(flag & TEA_PACK_FLAG_IGNORE_EMPTY);
@@ -73,7 +260,7 @@ static int pack_kv_word(struct tea_tcursor_kv *tab, char flag, const char *str, 
 		key_begin = i;
 
 		// key: end
-		TEA_PACK_SEEK_WORD_KEY_END(key_end, i, match, eq_override, str, len, eq, eql, sp, spl);
+		key_end = seek_word_key_end(&i, &eq_override, str, len, eq, eql, sp, spl);
 
 		// value: begin
 		value_begin = i;
@@ -83,7 +270,7 @@ static int pack_kv_word(struct tea_tcursor_kv *tab, char flag, const char *str, 
 			value_end = i;
 			eq_override = 0;
 		} else {
-			TEA_PACK_SEEK_WORD_VALUE_END(value_end, i, match, str, len, sp, spl);
+			value_end = seek_word_value_end(&i, str, len, sp, spl);
 		}
 
 		// capture
@@ -109,8 +296,8 @@ static int pack_kv_word(struct tea_tcursor_kv *tab, char flag, const char *str, 
 
 static int pack_kv_multi(struct tea_tcursor_kv *tab, char flag, const char *str, size_t len, const char *eq, size_t eql, const char *sp, size_t spl)
 {
-	char sp_dict[TEA_PACK_MULTI_DICT_SIZE] = {};
-	char eq_dict[TEA_PACK_MULTI_DICT_SIZE] = {};
+	unsigned char sp_dict[TEA_PACK_MULTI_DICT_SIZE] = {};
+	unsigned char eq_dict[TEA_PACK_MULTI_DICT_SIZE] = {};
 
 	size_t key_begin;
 	size_t key_end;
@@ -118,8 +305,8 @@ static int pack_kv_multi(struct tea_tcursor_kv *tab, char flag, const char *str,
 	size_t value_end;
 	size_t i;
 
-	TEA_PACK_MULTI_DICT_INIT(sp_dict, i, sp, spl);
-	TEA_PACK_MULTI_DICT_INIT(eq_dict, i, eq, eql);
+	multi_dict_init(sp_dict, (unsigned const char *) sp, spl);
+	multi_dict_init(eq_dict, (unsigned const char *) eq, eql);
 
 	char empty = !(flag & TEA_PACK_FLAG_IGNORE_EMPTY);
 	char trim_key = flag & TEA_PACK_FLAG_SPACE_TRIM_KEY;
@@ -130,13 +317,13 @@ static int pack_kv_multi(struct tea_tcursor_kv *tab, char flag, const char *str,
 		key_begin = i;
 
 		// key: end
-		TEA_PACK_SEEK_MULTI_KEYVALUE_END(key_end, i, str, len, eq_dict, sp_dict);
+		key_end = seek_multi_keyvalue_end(&i, (unsigned const char *) str, len, eq_dict, sp_dict);
 
 		// value: begin
 		value_begin = i;
 
 		// value: end
-		TEA_PACK_SEEK_MULTI_VALUE_END(value_end, i, str, len, sp_dict);
+		value_end = seek_multi_value_end(&i, (unsigned const char *) str, len, sp_dict);
 
 		// capture
 		if (trim_key) {
@@ -161,16 +348,15 @@ static int pack_kv_multi(struct tea_tcursor_kv *tab, char flag, const char *str,
 
 static int pack_kv_multi_key(struct tea_tcursor_kv *tab, char flag, const char *str, size_t len, const char *eq, size_t eql, const char *sp, size_t spl)
 {
-	char eq_dict[TEA_PACK_MULTI_DICT_SIZE] = {};
+	unsigned char eq_dict[TEA_PACK_MULTI_DICT_SIZE] = {};
 
 	size_t key_begin;
 	size_t key_end;
 	size_t value_begin;
 	size_t value_end;
-	size_t match;
 	size_t i;
 
-	TEA_PACK_MULTI_DICT_INIT(eq_dict, i, eq, eql);
+	multi_dict_init(eq_dict, (unsigned const char *) eq, eql);
 
 	char empty = !(flag & TEA_PACK_FLAG_IGNORE_EMPTY);
 	char trim_key = flag & TEA_PACK_FLAG_SPACE_TRIM_KEY;
@@ -182,7 +368,7 @@ static int pack_kv_multi_key(struct tea_tcursor_kv *tab, char flag, const char *
 		key_begin = i;
 
 		// key: end
-		TEA_PACK_SEEK_MULTI_WORD_KEY_END_REVERSE(key_end, i, match, eq_override, str, len, sp, spl, eq_dict);
+		key_end = seek_multi_word_key_end_reverse(&i, &eq_override, str, len, sp, spl, eq_dict);
 
 		// value: begin
 		value_begin = i;
@@ -192,7 +378,7 @@ static int pack_kv_multi_key(struct tea_tcursor_kv *tab, char flag, const char *
 			value_end = i;
 			eq_override = 0;
 		} else {
-			TEA_PACK_SEEK_MULTI_WORD_VALUE_END(value_end, i, match, str, len, sp, spl);
+			value_end = seek_multi_word_value_end(&i, str, len, sp, spl);
 		}
 
 		// capture
@@ -218,16 +404,15 @@ static int pack_kv_multi_key(struct tea_tcursor_kv *tab, char flag, const char *
 
 static int pack_kv_multi_value(struct tea_tcursor_kv *tab, char flag, const char *str, size_t len, const char *eq, size_t eql, const char *sp, size_t spl)
 {
-	char sp_dict[TEA_PACK_MULTI_DICT_SIZE] = {};
+	unsigned char sp_dict[TEA_PACK_MULTI_DICT_SIZE] = {};
 
 	size_t key_begin;
 	size_t key_end;
 	size_t value_begin;
 	size_t value_end;
-	size_t match;
 	size_t i;
 
-	TEA_PACK_MULTI_DICT_INIT(sp_dict, i, sp, spl);
+	multi_dict_init(sp_dict, (unsigned const char *) sp, spl);
 
 	char empty = !(flag & TEA_PACK_FLAG_IGNORE_EMPTY);
 	char trim_key = flag & TEA_PACK_FLAG_SPACE_TRIM_KEY;
@@ -238,13 +423,13 @@ static int pack_kv_multi_value(struct tea_tcursor_kv *tab, char flag, const char
 		key_begin = i;
 
 		// key: end
-		TEA_PACK_SEEK_MULTI_WORD_KEY_END(key_end, i, match, str, len, eq, eql, sp_dict);
+		key_end = seek_multi_word_key_end(&i, str, len, eq, eql, sp_dict);
 
 		// value: begin
 		value_begin = i;
 
 		// value: end
-		TEA_PACK_SEEK_MULTI_VALUE_END(value_end, i, str, len, sp_dict);
+		value_end = seek_multi_value_end(&i, (unsigned const char *) str, len, sp_dict);
 
 		// capture
 		if (trim_key) {
@@ -271,7 +456,7 @@ int tea_pack_kv(lua_State *l, char flag, const char *str, size_t len, const char
 {
 	struct tea_tcursor_kv tab;
 
-	TEA_TCURSOR_KV_INIT(&tab);
+	tea_tcursor_kv_init(&tab);
 
 	int stat;
 
@@ -316,6 +501,9 @@ int tea_pack_kv(lua_State *l, char flag, const char *str, size_t len, const char
 	return 1;
 }
 
+//
+// PACK
+//
 
 static int pack_char(struct tea_tcursor *tab, char flag, const char *str, size_t len, const char sp)
 {
@@ -331,7 +519,7 @@ static int pack_char(struct tea_tcursor *tab, char flag, const char *str, size_t
 		value_begin = i;
 
 		// value: end
-		TEA_PACK_SEEK_VALUE_END(value_end, i, str, len, sp);
+		value_end = seek_value_end(&i, str, len, sp);
 
 		// capture
 		if (trim) {
@@ -354,7 +542,6 @@ static int pack_word(struct tea_tcursor *tab, char flag, const char *str, size_t
 {
 	size_t value_begin;
 	size_t value_end;
-	size_t match;
 	size_t i;
 
 	char empty = !(flag & TEA_PACK_FLAG_IGNORE_EMPTY);
@@ -365,7 +552,7 @@ static int pack_word(struct tea_tcursor *tab, char flag, const char *str, size_t
 		value_begin = i;
 
 		// value: end
-		TEA_PACK_SEEK_WORD_VALUE_END(value_end, i, match, str, len, sp, spl);
+		value_end = seek_word_value_end(&i, str, len, sp, spl);
 
 		// capture
 		if (trim) {
@@ -386,13 +573,13 @@ static int pack_word(struct tea_tcursor *tab, char flag, const char *str, size_t
 
 static int pack_multi(struct tea_tcursor *tab, char flag, const char *str, size_t len, const char *sp, size_t spl)
 {
-	char sp_dict[TEA_PACK_MULTI_DICT_SIZE] = {};
+	unsigned char sp_dict[TEA_PACK_MULTI_DICT_SIZE] = {};
 
 	size_t value_begin;
 	size_t value_end;
 	size_t i;
 
-	TEA_PACK_MULTI_DICT_INIT(sp_dict, i, sp, spl);
+	multi_dict_init(sp_dict, (unsigned const char *) sp, spl);
 
 	char empty = !(flag & TEA_PACK_FLAG_IGNORE_EMPTY);
 	char trim = flag & TEA_PACK_FLAG_SPACE_TRIM_VALUE;
@@ -402,7 +589,7 @@ static int pack_multi(struct tea_tcursor *tab, char flag, const char *str, size_
 		value_begin = i;
 
 		// value: end
-		TEA_PACK_SEEK_MULTI_VALUE_END(value_end, i, str, len, sp_dict);
+		value_end = seek_multi_value_end(&i, (unsigned const char *) str, len, sp_dict);
 
 		// capture
 		if (trim) {
@@ -425,7 +612,7 @@ int tea_pack(lua_State *l, char flag, const char *str, size_t len, const char *s
 {
 	struct tea_tcursor tab;
 
-	TEA_TCURSOR_INIT(&tab);
+	tea_tcursor_init(&tab);
 
 	int stat;
 

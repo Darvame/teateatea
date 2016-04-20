@@ -414,4 +414,15 @@ eqlkvTables(tea.kvpack(" 1 = 2 ; 3 = 4 ;", "=", ";", nil, true), {
 eqlkvTables(tea.kvpack(" 1 = 2 ; 3 = 4 ;", "=", ";", nil, nil, true), {
 	[' 1 '] = '2',
 	[' 3 '] = '4',
-}, "tws value"); ok(); -- 51
+}, "tws value"); ok(); -- 52
+
+crunning = "pack single end";
+eqlTables(tea.pack("qwerty88qwerty", "8888"), {
+	"qwerty88qwerty"
+}, "one long");
+ok(); -- 53
+
+eqlTables(tea.kvpack("1=qwerty88qwerty", "=", "8888"), {
+	['1'] = "qwerty88qwerty"
+}, "one long");
+ok(); -- 54

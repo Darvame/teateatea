@@ -5,27 +5,7 @@
 #include "tea_tcursor.h"
 #include "tea_pack.h"
 #include "tea_trim.h"
-
-static __inline__ int meta_tostring(lua_State *l, int obj)
-{
-	if (luaL_callmeta(l, obj, "__tostring")) {
-		lua_replace(l, obj < 0 ? (obj - 1) : obj);
-		return 1;
-	}
-
-	return 0;
-}
-
-static __inline__ const char *tolstring(lua_State *l, int obj, size_t *len)
-{
-	const char *str = lua_tolstring(l, obj, len);
-
-	if (!str && meta_tostring(l, obj)) {
-		str = lua_tolstring(l, obj, len);
-	}
-
-	return str;
-}
+#include "tea_laux.h"
 
 static int pack_kv(lua_State *l)
 {
@@ -48,9 +28,9 @@ static int pack_kv(lua_State *l)
 		case 6: if (lua_toboolean(l, 6)) flag|= TEA_PACK_FLAG_SPACE_TRIM_VALUE;
 		case 5: if (lua_toboolean(l, 5)) flag|= TEA_PACK_FLAG_SPACE_TRIM_KEY;
 		case 4: if (lua_toboolean(l, 4)) flag|= TEA_PACK_FLAG_IGNORE_EMPTY;
-		case 3: sp = tolstring(l, 3, &spl);
-		case 2: eq = tolstring(l, 2, &eql);
-		case 1: str = tolstring(l, 1, &len);
+		case 3: sp = tea_tolstring(l, 3, &spl);
+		case 2: eq = tea_tolstring(l, 2, &eql);
+		case 1: str = tea_tolstring(l, 1, &len);
 	}
 
 	return tea_pack_kv(l, flag, str, len, eq, eql, sp, spl);
@@ -73,8 +53,8 @@ static int pack(lua_State *l)
 		case 5: if (lua_toboolean(l, 5)) flag|= TEA_PACK_FLAG_VALUE_MULTI;
 		case 4: if (lua_toboolean(l, 4)) flag|= TEA_PACK_FLAG_SPACE_TRIM_VALUE;
 		case 3: if (lua_toboolean(l, 3)) flag|= TEA_PACK_FLAG_IGNORE_EMPTY;
-		case 2: sp = tolstring(l, 2, &spl);
-		case 1: str = tolstring(l, 1, &len);
+		case 2: sp = tea_tolstring(l, 2, &spl);
+		case 1: str = tea_tolstring(l, 1, &len);
 	}
 
 	return tea_pack(l, flag, str, len, sp, spl);
@@ -82,28 +62,37 @@ static int pack(lua_State *l)
 
 static int trim(lua_State *l)
 {
-	if (lua_gettop(l) > 1) {
-		lua_pop(l, lua_gettop(l) - 1);
-	}
+	int argc = lua_gettop(l);
+	int i;
 
 	size_t len;
-	const char *str = tolstring(l, 1, &len);
+	const char *str;
 
-	if(!str) {
-		lua_pushnil(l);
-		return 1;
+	size_t begin;
+	size_t end;
+
+	for (i = 1; i <= argc; ++i) {
+		str = tea_tolstring(l, i, &len);
+
+		if (str) {
+
+			begin = 0;
+			end = len;
+
+			TEA_PACK_SPACE_TRIM_WORD(str, begin, end);
+
+			if (begin || end < len) {
+				lua_pushlstring(l, &str[begin], end - begin);
+			} else {
+				lua_pushvalue(l, i);
+			}
+
+		} else {
+			lua_pushnil(l);
+		}
 	}
 
-	size_t begin = 0;
-	size_t end = len;
-
-	TEA_PACK_SPACE_TRIM_WORD(str, begin, end);
-
-	if (begin || end < len) {
-		lua_pushlstring(l, &str[begin], end - begin);
-	}
-
-	return 1;
+	return argc;
 }
 
 static const luaL_Reg api_list[] = {

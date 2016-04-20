@@ -9,11 +9,6 @@
 #define TEA_TCURSOR_KV_WORKLOAD 64
 #define TEA_TCURSOR_KV_INITIAL TEA_TCURSOR_KV_WORKLOAD
 
-#define TEA_TCURSOR_INIT(c)\
-	(c)->size = 0;\
-	(c)->parts = 0;
-
-#define TEA_TCURSOR_KV_INIT TEA_TCURSOR_INIT
 
 struct tea_tcursor_part {
 	size_t used;
@@ -56,5 +51,17 @@ struct tea_tcursor_kv {
 
 int tea_tcursor_kv_add(struct tea_tcursor_kv *, const char *, size_t, const char *, size_t);
 void tea_tcursor_kv_dump(lua_State *, struct tea_tcursor_kv *);
+
+inline void tea_tcursor_init(struct tea_tcursor *c)
+{
+	(c)->size = 0;
+	(c)->parts = 0;
+}
+
+inline void tea_tcursor_kv_init(struct tea_tcursor_kv *c)
+{
+	(c)->size = 0;
+	(c)->parts = 0;
+}
 
 #endif
