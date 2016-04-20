@@ -117,7 +117,7 @@ int luaopen_teateatea(lua_State *l)
 	}
 
 	lua_pushstring(l, "_VERSION");
-	lua_pushnumber(l, 101);
+	lua_pushnumber(l, 102);
 	lua_rawset(l, -3);
 
 	return 1;

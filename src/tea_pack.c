@@ -52,7 +52,6 @@ static inline size_t seek_word_key_end(size_t *ip, char *eq_override, const char
 	return i - match;
 }
 
-
 static inline size_t seek_word_value_end(size_t *ip, const char *str, size_t len, const char *sp, size_t spl)
 {
 	size_t match = 0;
@@ -149,7 +148,7 @@ static inline size_t seek_multi_word_key_end(size_t *ip, const char *str, size_t
 			match = 0;
 		}
 
-		if (spd[(unsigned const char) str[i]]) break;
+		if (spd[(unsigned const char)str[i]]) break;
 
 		++i;
 	}
