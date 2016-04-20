@@ -52,13 +52,13 @@ struct tea_tcursor_kv {
 int tea_tcursor_kv_add(struct tea_tcursor_kv *, const char *, size_t, const char *, size_t);
 void tea_tcursor_kv_dump(lua_State *, struct tea_tcursor_kv *);
 
-inline void tea_tcursor_init(struct tea_tcursor *c)
+static inline void tea_tcursor_init(struct tea_tcursor *c)
 {
 	(c)->size = 0;
 	(c)->parts = 0;
 }
 
-inline void tea_tcursor_kv_init(struct tea_tcursor_kv *c)
+static inline void tea_tcursor_kv_init(struct tea_tcursor_kv *c)
 {
 	(c)->size = 0;
 	(c)->parts = 0;

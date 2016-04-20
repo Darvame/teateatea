@@ -16,7 +16,7 @@ static inline int meta_tostring(lua_State *l, int obj)
 	return 0;
 }
 
-inline const char *tea_tolstring(lua_State *l, int obj, size_t *len)
+static inline const char *tea_tolstring(lua_State *l, int obj, size_t *len)
 {
 	const char *str = lua_tolstring(l, obj, len);
 
