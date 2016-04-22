@@ -39,25 +39,25 @@ int tea_tcursor_add(struct tea_tcursor *cursor, const char *value, size_t vlen)
 	return 0;
 }
 
-void tea_tcursor_dump(lua_State *L, struct tea_tcursor *cursor)
+void tea_tcursor_dump(lua_State *l, struct tea_tcursor *cursor)
 {
 	struct tea_tcursor_part *current = cursor->first;
 	struct tea_tcursor_part *next;
 
-	lua_createtable(L, cursor->size, 0);
+	lua_createtable(l, cursor->size, 0);
 
 	size_t i, j, count;
 
 	for (count = 0, i = cursor->size > TEA_TCURSOR_INITITAL ? TEA_TCURSOR_INITITAL : cursor->size; i > 0; --i) {
-		lua_pushlstring(L, cursor->value[count], cursor->vlen[count]);
-		lua_rawseti(L, -2, ++count);
+		lua_pushlstring(l, cursor->value[count], cursor->vlen[count]);
+		lua_rawseti(l, -2, ++count);
 	}
 
 	for (i = 0; i < cursor->parts; ++i) {
 
 		for (j = 0; j < current->used; ++j) {
-			lua_pushlstring(L, current->value[j], current->vlen[j]);
-			lua_rawseti(L, -2, ++count);
+			lua_pushlstring(l, current->value[j], current->vlen[j]);
+			lua_rawseti(l, -2, ++count);
 		}
 
 		next = current->next;
@@ -113,27 +113,27 @@ int tea_tcursor_kv_add(struct tea_tcursor_kv *cursor, const char *key, size_t kl
 	return 0;
 }
 
-void tea_tcursor_kv_dump(lua_State *L, struct tea_tcursor_kv *cursor)
+void tea_tcursor_kv_dump(lua_State *l, struct tea_tcursor_kv *cursor)
 {
 	struct tea_tcursor_kv_part *current = cursor->first;
 	struct tea_tcursor_kv_part *next;
 
-	lua_createtable(L, 0, cursor->size);
+	lua_createtable(l, 0, cursor->size);
 
 	size_t i, j;
 
 	for (j = 0, i = cursor->size > TEA_TCURSOR_INITITAL ? TEA_TCURSOR_INITITAL : cursor->size; j < i; ++j) {
-		lua_pushlstring(L, cursor->key[j], cursor->klen[j]);
-		lua_pushlstring(L, cursor->value[j], cursor->vlen[j]);
-		lua_rawset(L, -3);
+		lua_pushlstring(l, cursor->key[j], cursor->klen[j]);
+		lua_pushlstring(l, cursor->value[j], cursor->vlen[j]);
+		lua_rawset(l, -3);
 	}
 
 	for (i = 0; i < cursor->parts; ++i) {
 
 		for (j = 0; j < current->used; ++j) {
-			lua_pushlstring(L, current->key[j], current->klen[j]);
-			lua_pushlstring(L, current->value[j], current->vlen[j]);
-			lua_rawset(L, -3);
+			lua_pushlstring(l, current->key[j], current->klen[j]);
+			lua_pushlstring(l, current->value[j], current->vlen[j]);
+			lua_rawset(l, -3);
 		}
 
 		next = current->next;

@@ -1,5 +1,5 @@
-SOURCES=tea_tcursor.c tea_pack.c teateatea.c
-HEADERS=tea_tcursor.h tea_pack.h tea_trim.h tea_laux.h
+SOURCES=tea_tcursor.c tea_pack.c tea_cookie.c teateatea.c
+HEADERS=tea_tcursor.h tea_pack.h tea_cookie.h tea_trim.h tea_laux.h
 TARGET=teateatea.so
 TESTFILE=test.lua
 

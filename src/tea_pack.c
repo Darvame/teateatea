@@ -195,7 +195,7 @@ static inline size_t seek_multi_word_key_end_reverse(size_t *ip, char *eq_overri
 // KV PACK
 //
 
-static int pack_kv_char(struct tea_tcursor_kv *tab, char flag, const char *str, size_t len, const char eq, const char sp)
+static int pack_kv_char(struct tea_tcursor_kv *tab, unsigned char flag, const char *str, size_t len, const char eq, const char sp)
 {
 	size_t key_begin;
 	size_t key_end;
@@ -241,7 +241,7 @@ static int pack_kv_char(struct tea_tcursor_kv *tab, char flag, const char *str, 
 	return 0;
 }
 
-static int pack_kv_word(struct tea_tcursor_kv *tab, char flag, const char *str, size_t len, const char *eq, size_t eql, const char *sp, size_t spl)
+static int pack_kv_word(struct tea_tcursor_kv *tab, unsigned char flag, const char *str, size_t len, const char *eq, size_t eql, const char *sp, size_t spl)
 {
 	size_t key_begin;
 	size_t key_end;
@@ -293,7 +293,7 @@ static int pack_kv_word(struct tea_tcursor_kv *tab, char flag, const char *str, 
 	return 0;
 }
 
-static int pack_kv_multi(struct tea_tcursor_kv *tab, char flag, const char *str, size_t len, const char *eq, size_t eql, const char *sp, size_t spl)
+static int pack_kv_multi(struct tea_tcursor_kv *tab, unsigned char flag, const char *str, size_t len, const char *eq, size_t eql, const char *sp, size_t spl)
 {
 	unsigned char sp_dict[TEA_PACK_MULTI_DICT_SIZE] = {};
 	unsigned char eq_dict[TEA_PACK_MULTI_DICT_SIZE] = {};
@@ -345,7 +345,7 @@ static int pack_kv_multi(struct tea_tcursor_kv *tab, char flag, const char *str,
 	return 0;
 }
 
-static int pack_kv_multi_key(struct tea_tcursor_kv *tab, char flag, const char *str, size_t len, const char *eq, size_t eql, const char *sp, size_t spl)
+static int pack_kv_multi_key(struct tea_tcursor_kv *tab, unsigned char flag, const char *str, size_t len, const char *eq, size_t eql, const char *sp, size_t spl)
 {
 	unsigned char eq_dict[TEA_PACK_MULTI_DICT_SIZE] = {};
 
@@ -401,7 +401,7 @@ static int pack_kv_multi_key(struct tea_tcursor_kv *tab, char flag, const char *
 	return 0;
 }
 
-static int pack_kv_multi_value(struct tea_tcursor_kv *tab, char flag, const char *str, size_t len, const char *eq, size_t eql, const char *sp, size_t spl)
+static int pack_kv_multi_value(struct tea_tcursor_kv *tab, unsigned char flag, const char *str, size_t len, const char *eq, size_t eql, const char *sp, size_t spl)
 {
 	unsigned char sp_dict[TEA_PACK_MULTI_DICT_SIZE] = {};
 
@@ -451,7 +451,7 @@ static int pack_kv_multi_value(struct tea_tcursor_kv *tab, char flag, const char
 	return 0;
 }
 
-int tea_pack_kv(lua_State *l, char flag, const char *str, size_t len, const char *eq, size_t eql, const char *sp, size_t spl)
+int tea_pack_kv(lua_State *l, unsigned char flag, const char *str, size_t len, const char *eq, size_t eql, const char *sp, size_t spl)
 {
 	struct tea_tcursor_kv tab;
 
@@ -504,7 +504,7 @@ int tea_pack_kv(lua_State *l, char flag, const char *str, size_t len, const char
 // PACK
 //
 
-static int pack_char(struct tea_tcursor *tab, char flag, const char *str, size_t len, const char sp)
+static int pack_char(struct tea_tcursor *tab, unsigned char flag, const char *str, size_t len, const char sp)
 {
 	size_t value_begin;
 	size_t value_end;
@@ -537,7 +537,7 @@ static int pack_char(struct tea_tcursor *tab, char flag, const char *str, size_t
 	return 0;
 }
 
-static int pack_word(struct tea_tcursor *tab, char flag, const char *str, size_t len, const char *sp, size_t spl)
+static int pack_word(struct tea_tcursor *tab, unsigned char flag, const char *str, size_t len, const char *sp, size_t spl)
 {
 	size_t value_begin;
 	size_t value_end;
@@ -570,7 +570,7 @@ static int pack_word(struct tea_tcursor *tab, char flag, const char *str, size_t
 	return 0;
 }
 
-static int pack_multi(struct tea_tcursor *tab, char flag, const char *str, size_t len, const char *sp, size_t spl)
+static int pack_multi(struct tea_tcursor *tab, unsigned char flag, const char *str, size_t len, const char *sp, size_t spl)
 {
 	unsigned char sp_dict[TEA_PACK_MULTI_DICT_SIZE] = {};
 
@@ -607,7 +607,7 @@ static int pack_multi(struct tea_tcursor *tab, char flag, const char *str, size_
 	return 0;
 }
 
-int tea_pack(lua_State *l, char flag, const char *str, size_t len, const char *sp, size_t spl)
+int tea_pack(lua_State *l, unsigned char flag, const char *str, size_t len, const char *sp, size_t spl)
 {
 	struct tea_tcursor tab;
 

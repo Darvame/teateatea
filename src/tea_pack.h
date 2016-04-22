@@ -21,7 +21,7 @@
 #define TEA_PACK_SP_DEFAULT_LEN 0 // an empty string
 
 
-int tea_pack_kv(lua_State *, char, const char *, size_t, const char *, size_t, const char *, size_t);
-int tea_pack(lua_State *, char, const char *, size_t, const char *, size_t);
+int tea_pack_kv(lua_State *, unsigned char, const char *, size_t, const char *, size_t, const char *, size_t);
+int tea_pack(lua_State *, unsigned char, const char *, size_t, const char *, size_t);
 
 #endif

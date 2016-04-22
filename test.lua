@@ -426,3 +426,30 @@ eqlTables(tea.kvpack("1=qwerty88qwerty", "=", "8888"), {
 	['1'] = "qwerty88qwerty"
 }, "one long");
 ok(); -- 54
+
+crunning = "mask"
+
+eqlkvTables(tea.mkvpack("a=EQL!b;c=EQL!d,x=EQL! y ;empty=EQL!!empty2!!empty3=12345=EQL!12345", "=EQL!", ";,=!", tea.mask.kvpack(nil, nil, nil, nil, true)), {
+	["a"] = "b";
+	["c"] = "d";
+	["x"] = " y ";
+	["empty"] = "";
+	["empty2"] = "";
+	["empty3"] = "";
+	["12345"]="12345";
+}, "kvmask");
+ok(); -- 55
+
+eqlkvTables(tea.mkvpack("a=b;c=d;x= y ;empty     ;   ;1234 5 =12345   ;", "=", ";", tea.mask.kvpack(nil, true, true)), {
+	["a"] = "b";
+	["c"] = "d";
+	["x"] = "y";
+	["1234 5"]="12345";
+	["empty"] = "";
+}, "kvmask");
+ok(); -- 56
+
+eqlTables(tea.mpack("a b c; i; ; ;   ;*&; 123;  -  ;          last ;      ", ";", tea.mask.pack(nil, true)), {
+	"a b c", "i", "", "", "", "*&", "123", "-", "last", ""
+}, "mask");
+ok(); -- 57

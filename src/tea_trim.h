@@ -13,7 +13,7 @@
 	#include "ctype.h"
 
 	#define TEA_PACK_WHILE_ISSPACE(w, c, modify)\
-		while(w) { if (isspace((int)c)) modify; else break; }
+		while(w && isspace(c)) modify;
 
 #endif
 
