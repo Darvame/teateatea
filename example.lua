@@ -2,19 +2,20 @@ local tea = require "teateatea";
 
 --[[
 	local tab = tea.pack(str, separator[, drop_empty, trim_value_whitespaces, multi_separators]);
-	local tab = tea.kvpack(str, equals, separator[, drop_empty, trim_key_whitespaces, trim_value_whitespaces, multi_equals, multi_separators]);
+	local tab = tea.kvpack(str, equals, separator[, drop_empty, trim_key_whitespaces, trim_value_whitespaces, multi_equals, multi_separators, do_not_swap_empty]);
 	local trimed_str = tea.trim(str);
 
 	where:
-	str = "string" or metatable.__tostring result (target string)
-	separator = "string" or metatable.__tostring result (separation token)
-	equals = "string" or metatable.__tostring result (equals token)
+	str : "string" or (metatable.__tostring() result) - target string
+	separator : "string" or (metatable.__tostring() result) - separation token
+	equals : "string" or (metatable.__tostring() result) - equals token
 
-	drop_empty = boolean (don't push empty values)
-	trim_key_whitespaces = boolean (trim whitespaces from key before pushing)
-	trim_value_whitespaces = boolean (trim whitespaces from value before pushing)
-	multi_separators = boolean (use the separator value as a collection of 1 byte separation tokens) UTF-8 (2 bytes and more) is unsupported
-	multi_equals = boolean (use the equals value as a collection of 1 byte equals tokens) UTF-8 (2 bytes and more) is unsupported
+	drop_empty : boolean - do NOT push empty values
+	trim_key_whitespaces : boolean (trim whitespaces from key before pushing
+	trim_value_whitespaces : boolean - trim whitespaces from value before pushing
+	multi_separators : boolean - use the separator value as a collection of 1 byte separation tokens, UTF-8 (2 bytes and more) is unsupported
+	multi_equals : boolean - use the equals value as a collection of 1 byte equals tokens, UTF-8 (2 bytes and more) is unsupported
+	do_not_swap_empty : boolean - do NOT swap an empty key with the corresponding value
 
 ]]
 
@@ -154,9 +155,9 @@ local tab = tea.kvpack(str, "=", ";:!", false, false, false, false, true); -- 8t
 	}
 ]]
 
---- *** empty keys are not supported!
+--- *** empty keys are not supported! Empty keys will be replaced with the corresponding values (may be disabled)
 
-local str = "key1=value1;;;;;=broken;   =broken_trimed_key; key2 = value2; key3=;key4";
+local str = "key1=value1;;;;;=swaped;   =swapped_trimed_key; key2 = value2; key3=;key4";
 
 local tab = tea.kvpack(str, "=", ";", false, true, true); -- trim whitespaces (but do not drop empty values)
 
@@ -166,6 +167,8 @@ local tab = tea.kvpack(str, "=", ";", false, true, true); -- trim whitespaces (b
 		["key2"] = "value2",
 		["key3"] = "",
 		["key4"] = "",
+		["swaped"] = "",
+		["swapped_trimed_key"] = "",
 	}
 ]]
 
@@ -187,7 +190,7 @@ local tab = tea.kvpack(str, "=", ";", false, true, false); -- trim whitespaces o
 
 --- *** drop empty values
 
-local str = "key1=value1;=broken;   =broken_trimed_key; key2 = value2; key3=;key4";
+local str = "key1=value1;=swaped;   =swapped_trimed_key; key2 = value2; key3=;key4";
 
 local tab = tea.kvpack(str, "=", ";", true, true, true); -- also ignore empty values and trim both (keys and values)
 

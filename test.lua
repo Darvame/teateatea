@@ -396,7 +396,7 @@ eqlkvTables(tea.kvpack("1=2;3=4;", nil, nil, true), {
 }, "drop emptykv"); ok(); -- 48
 
 crunning = "meta other";
-eqlkvTables(tea.pack("1;2;3;4;", setmetatable({";"}, {__tostring = function(self) return self[1]; end})), {
+eqlTables(tea.pack("1;2;3;4;", setmetatable({";"}, {__tostring = function(self) return self[1]; end})), {
 	'1', '2', '3', '4', '',
 }, "meta sep"); ok(); -- 49
 
@@ -422,7 +422,7 @@ eqlTables(tea.pack("qwerty88qwerty", "8888"), {
 }, "one long");
 ok(); -- 53
 
-eqlTables(tea.kvpack("1=qwerty88qwerty", "=", "8888"), {
+eqlkvTables(tea.kvpack("1=qwerty88qwerty", "=", "8888"), {
 	['1'] = "qwerty88qwerty"
 }, "one long");
 ok(); -- 54
@@ -453,3 +453,43 @@ eqlTables(tea.mpack("a b c; i; ; ;   ;*&; 123;  -  ;          last ;      ", ";"
 	"a b c", "i", "", "", "", "*&", "123", "-", "last", ""
 }, "mask");
 ok(); -- 57
+
+crunning = "no empty swap"
+
+eqlkvTables(tea.kvpack("1=2;3=4;5=6;7=;8;=9;==10;100=100", "=", ";", false, false, false, false, false, true), {
+	['1'] = "2";
+	['3'] = "4";
+	['5'] = "6";
+	['7'] = "";
+	['8'] = "";
+	['100'] = '100';
+}, "do not swap");
+ok(); -- 58
+
+eqlkvTables(tea.kvpack("1=2;3=4;5=6;7=;8;=9;==10;100=100", "=", ";", true, false, false, false, false, true), {
+	['1'] = "2";
+	['3'] = "4";
+	['5'] = "6";
+	['100'] = '100';
+}, "do not swap, drop empty");
+ok(); -- 59
+
+eqlkvTables(tea.kvpack("1=2;3=4;5=6;7=;8;=9;==10;100=100", "=", ";"), {
+	['1'] = "2";
+	['3'] = "4";
+	['5'] = "6";
+	['7'] = "";
+	['8'] = "";
+	['9'] = "";
+	['=10'] = "";
+	['100'] = '100';
+}, "do swap");
+ok(); -- 60
+
+eqlkvTables(tea.kvpack("1=2;3=4;5=6;7=;8;=9;==10;100=100", "=", ";", true), {
+	['1'] = "2";
+	['3'] = "4";
+	['5'] = "6";
+	['100'] = '100';
+}, "do swap, drop empty");
+ok(); -- 61

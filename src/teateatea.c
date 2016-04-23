@@ -25,10 +25,11 @@ static int pack_kv(lua_State *l)
 
 	unsigned char flag = 0;
 
-	switch (argc < 9 ? argc : 9) {
-		case 9: lua_pop(l, argc - 8);
-		case 8: if (lua_toboolean(l, 8)) flag|= TEA_PACK_FLAG_VALUE_MULTI;
-		case 7: if (lua_toboolean(l, 7)) flag|= TEA_PACK_FLAG_KEY_MULTI;
+	switch (argc < 10 ? argc : 10) {
+		case 10: lua_pop(l, argc - 9);
+		case 9: if (lua_toboolean(l, 9)) flag|= TEA_PACK_FLAG_NO_SWAP_EMPTY_KEYVALUE;
+		case 8: if (lua_toboolean(l, 8)) flag|= TEA_PACK_FLAG_MULTI_VALUE;
+		case 7: if (lua_toboolean(l, 7)) flag|= TEA_PACK_FLAG_MULTI_KEY;
 		case 6: if (lua_toboolean(l, 6)) flag|= TEA_PACK_FLAG_SPACE_TRIM_VALUE;
 		case 5: if (lua_toboolean(l, 5)) flag|= TEA_PACK_FLAG_SPACE_TRIM_KEY;
 		case 4: if (lua_toboolean(l, 4)) flag|= TEA_PACK_FLAG_IGNORE_EMPTY;
@@ -70,9 +71,11 @@ static int mask_pack_kv(lua_State *l)
 	int argc = lua_gettop(l);
 	unsigned char flag = 0;
 
-	switch (argc < 5 ? argc : 5) {
-		case 5: if (lua_toboolean(l, 5)) flag|= TEA_PACK_FLAG_VALUE_MULTI;
-		case 4: if (lua_toboolean(l, 4)) flag|= TEA_PACK_FLAG_KEY_MULTI;
+	switch (argc < 7 ? argc : 7) {
+		case 7: lua_pop(l, argc - 6);
+		case 6: if (lua_toboolean(l, 6)) flag|= TEA_PACK_FLAG_NO_SWAP_EMPTY_KEYVALUE;
+		case 5: if (lua_toboolean(l, 5)) flag|= TEA_PACK_FLAG_MULTI_VALUE;
+		case 4: if (lua_toboolean(l, 4)) flag|= TEA_PACK_FLAG_MULTI_KEY;
 		case 3: if (lua_toboolean(l, 3)) flag|= TEA_PACK_FLAG_SPACE_TRIM_VALUE;
 		case 2: if (lua_toboolean(l, 2)) flag|= TEA_PACK_FLAG_SPACE_TRIM_KEY;
 		case 1: if (lua_toboolean(l, 1)) flag|= TEA_PACK_FLAG_IGNORE_EMPTY;
@@ -96,7 +99,7 @@ static int pack(lua_State *l)
 
 	switch (argc < 6 ? argc : 6) {
 		case 6: lua_pop(l, argc - 5);
-		case 5: if (lua_toboolean(l, 5)) flag|= TEA_PACK_FLAG_VALUE_MULTI;
+		case 5: if (lua_toboolean(l, 5)) flag|= TEA_PACK_FLAG_MULTI_VALUE;
 		case 4: if (lua_toboolean(l, 4)) flag|= TEA_PACK_FLAG_SPACE_TRIM_VALUE;
 		case 3: if (lua_toboolean(l, 3)) flag|= TEA_PACK_FLAG_IGNORE_EMPTY;
 		case 2: sp = tea_tolstring(l, 2, &spl);
@@ -133,8 +136,9 @@ static int mask_pack(lua_State *l)
 	int argc = lua_gettop(l);
 	unsigned char flag = 0;
 
-	switch (argc < 3 ? argc : 3) {
-		case 3: if (lua_toboolean(l, 3)) flag|= TEA_PACK_FLAG_VALUE_MULTI;
+	switch (argc < 4 ? argc : 4) {
+		case 4: lua_pop(l, argc - 3);
+		case 3: if (lua_toboolean(l, 3)) flag|= TEA_PACK_FLAG_MULTI_VALUE;
 		case 2: if (lua_toboolean(l, 2)) flag|= TEA_PACK_FLAG_SPACE_TRIM_VALUE;
 		case 1: if (lua_toboolean(l, 1)) flag|= TEA_PACK_FLAG_IGNORE_EMPTY;
 	}
@@ -159,10 +163,6 @@ static int trim(lua_State *l)
 
 	size_t begin;
 	size_t end;
-
-	//if (argc > 1) {
-		// check the stack?
-	//}
 
 	for (i = 1; i <= argc; ++i) {
 		str = tea_tolstring(l, i, &len);
