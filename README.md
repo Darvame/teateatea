@@ -8,11 +8,11 @@
 ```
 - pack (split) separated keys and values into a new key-value table
 ```lua
-    local table = teateatea.kvpack(str, equals, separator[, drop_empty, trim_key_whitespaces, trim_value_whitespaces, multi_equals, multi_separators]);
+    local table = teateatea.kvpack(str, equals, separator[, drop_empty, trim_key_whitespaces, trim_value_whitespaces, multi_equals, multi_separators, swap_empty_key]);
 ```
 - trim whitespaces
 ```lua
-    local trimed_str = teateatea.trim(str)
+    local trimed_str = teateatea.trim(str);
 ```
 
 ---

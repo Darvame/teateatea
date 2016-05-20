@@ -240,7 +240,7 @@ static inline void init_flag(unsigned char flag, unsigned char *empty, unsigned 
 static inline void init_flag_kv(unsigned char flag, unsigned char *empty, unsigned char *swap_empty, unsigned char *trim_key, unsigned char *trim_value)
 {
 	*empty = !(flag & TEA_PACK_FLAG_IGNORE_EMPTY);
-	*swap_empty = !(flag & TEA_PACK_FLAG_NO_SWAP_EMPTY_KEYVALUE);
+	*swap_empty = flag & TEA_PACK_FLAG_SWAP_EMPTY_KEYVALUE;
 	*trim_key = flag & TEA_PACK_FLAG_SPACE_TRIM_KEY;
 	*trim_value = flag & TEA_PACK_FLAG_SPACE_TRIM_VALUE;
 }
@@ -626,11 +626,12 @@ int tea_pack(lua_State *l, unsigned char flag, const char *str, size_t len, cons
 		}
 	}
 
+	tea_tcursor_dump(l, &tab);
+
 	if (stat) {
-		luaL_error(l, "unable to perform a %s pack (code: %d)", "key", stat);
+		luaL_error(l, "unable to perform a %s pack (code: %d)", "value", stat);
 	}
 
-	tea_tcursor_dump(l, &tab);
 	return 1;
 }
 
@@ -675,10 +676,11 @@ int tea_pack_kv(lua_State *l, unsigned char flag, const char *str, size_t len, c
 		}
 	}
 
+	tea_tcursor_kv_dump(l, &tab);
+
 	if (stat) {
 		luaL_error(l, "unable to perform a %s pack (code: %d)", "key-value", stat);
 	}
 
-	tea_tcursor_kv_dump(l, &tab);
 	return 1;
 }

@@ -1,7 +1,9 @@
 #include "lua.h"
 #include "lualib.h"
 #include "lauxlib.h"
+
 #include "limits.h"
+#include "string.h"
 
 #include "tea_tcursor.h"
 #include "tea_cookie.h"
@@ -27,7 +29,7 @@ static int pack_kv(lua_State *l)
 
 	switch (argc < 10 ? argc : 10) {
 		case 10: lua_pop(l, argc - 9);
-		case 9: if (lua_toboolean(l, 9)) flag|= TEA_PACK_FLAG_NO_SWAP_EMPTY_KEYVALUE;
+		case 9: if (lua_toboolean(l, 9)) flag|= TEA_PACK_FLAG_SWAP_EMPTY_KEYVALUE;
 		case 8: if (lua_toboolean(l, 8)) flag|= TEA_PACK_FLAG_MULTI_VALUE;
 		case 7: if (lua_toboolean(l, 7)) flag|= TEA_PACK_FLAG_MULTI_KEY;
 		case 6: if (lua_toboolean(l, 6)) flag|= TEA_PACK_FLAG_SPACE_TRIM_VALUE;
@@ -41,7 +43,7 @@ static int pack_kv(lua_State *l)
 	return tea_pack_kv(l, flag, str, len, eq, eql, sp, spl);
 }
 
-static int pack_mkv(lua_State *l)
+static int pack_kv_mask(lua_State *l)
 {
 	int argc = lua_gettop(l);
 
@@ -66,6 +68,31 @@ static int pack_mkv(lua_State *l)
 	return tea_pack_kv(l, (mflag >= 0 && mflag <= UCHAR_MAX) ? (unsigned char) mflag : 0, str, len, eq, eql, sp, spl);
 }
 
+static int pack_kv_mask_multiple(lua_State *l)
+{
+	int argc = lua_gettop(l);
+	int i;
+
+	size_t len;
+	size_t eql;
+	size_t spl;
+
+	long long int mflag = lua_tonumber(l, 1);
+
+	const char *str;
+	const char *eq = tea_tolstring(l, 2, &eql);
+	const char *sp = tea_tolstring(l, 3, &spl);
+
+	unsigned char flag = (mflag >= 0 && mflag <= UCHAR_MAX) ? (unsigned char) mflag : 0;
+
+	for(i = 4; i <= argc; ++i) {
+		str = tea_tolstring(l, i, &len);
+		tea_pack_kv(l, flag, str, len, eq, eql, sp, spl);
+	}
+
+	return argc - 3;
+}
+
 static int mask_pack_kv(lua_State *l)
 {
 	int argc = lua_gettop(l);
@@ -73,7 +100,7 @@ static int mask_pack_kv(lua_State *l)
 
 	switch (argc < 7 ? argc : 7) {
 		case 7: lua_pop(l, argc - 6);
-		case 6: if (lua_toboolean(l, 6)) flag|= TEA_PACK_FLAG_NO_SWAP_EMPTY_KEYVALUE;
+		case 6: if (lua_toboolean(l, 6)) flag|= TEA_PACK_FLAG_SWAP_EMPTY_KEYVALUE;
 		case 5: if (lua_toboolean(l, 5)) flag|= TEA_PACK_FLAG_MULTI_VALUE;
 		case 4: if (lua_toboolean(l, 4)) flag|= TEA_PACK_FLAG_MULTI_KEY;
 		case 3: if (lua_toboolean(l, 3)) flag|= TEA_PACK_FLAG_SPACE_TRIM_VALUE;
@@ -109,7 +136,7 @@ static int pack(lua_State *l)
 	return tea_pack(l, flag, str, len, sp, spl);
 }
 
-static int pack_m(lua_State *l)
+static int pack_mask(lua_State *l)
 {
 	int argc = lua_gettop(l);
 
@@ -129,6 +156,29 @@ static int pack_m(lua_State *l)
 	}
 
 	return tea_pack(l, (mflag >= 0 && mflag <= UCHAR_MAX) ? (unsigned char) mflag : 0, str, len, sp, spl);
+}
+
+static int pack_mask_multiple(lua_State *l)
+{
+	int argc = lua_gettop(l);
+	int i;
+
+	size_t len;
+	size_t spl;
+
+	long long int mflag = lua_tonumber(l, 1);
+
+	const char *str;
+	const char *sp = tea_tolstring(l, 2, &spl);
+
+	unsigned char flag = (mflag >= 0 && mflag <= UCHAR_MAX) ? (unsigned char) mflag : 0;
+
+	for(i = 3; i <= argc; ++i) {
+		str = tea_tolstring(l, i, &len);
+		tea_pack(l, flag, str, len, sp, spl);
+	}
+
+	return argc - 2;
 }
 
 static int mask_pack(lua_State *l)
@@ -188,13 +238,83 @@ static int trim(lua_State *l)
 	return argc;
 }
 
+static int begins_with(lua_State *l)
+{
+	size_t len;
+	size_t wlen;
+
+	const char *str =  tea_tolstring(l, 1, &len);
+	const char *wstr = tea_checklstring(l, 2, &wlen);
+
+	lua_pushboolean(l, str && wlen <= len && !memcmp(str, wstr, wlen));
+
+	return 1;
+}
+
+static int begins_with_multiple(lua_State *l)
+{
+	int argc = lua_gettop(l);
+	int i;
+
+	size_t len;
+	size_t wlen;
+
+	const char *str;
+	const char *wstr = tea_checklstring(l, 1, &wlen);
+
+	for(i = 2; i <= argc; ++i) {
+		str = tea_tolstring(l, i, &len);
+		lua_pushboolean(l, str && wlen <= len && !memcmp(str, wstr, wlen));
+	}
+
+	return argc - 1;
+}
+
+static int ends_with(lua_State *l)
+{
+	size_t len;
+	size_t wlen;
+
+	const char *str =  tea_tolstring(l, 1, &len);
+	const char *wstr = tea_checklstring(l, 2, &wlen);
+
+	lua_pushboolean(l, str && wlen <= len && !memcmp(&str[len - wlen], wstr, wlen));
+
+	return 1;
+}
+
+static int ends_with_multiple(lua_State *l)
+{
+	int argc = lua_gettop(l);
+	int i;
+
+	size_t len;
+	size_t wlen;
+
+	const char *str;
+	const char *wstr = tea_checklstring(l, 1, &wlen);
+
+	for(i = 2; i <= argc; ++i) {
+		str = tea_tolstring(l, i, &len);
+		lua_pushboolean(l, str && wlen <= len && !memcmp(&str[len - wlen], wstr, wlen));
+	}
+
+	return argc - 1;
+}
+
 static const luaL_Reg api_list[] = {
 
 	{"kvpack", pack_kv},
-	{"mkvpack", pack_mkv},
+	{"kvpack_mask", pack_kv_mask},
+	{"kvpack_mask_multiple", pack_kv_mask_multiple},
 	{"pack", pack},
-	{"mpack", pack_m},
+	{"pack_mask", pack_mask},
+	{"pack_mask_multiple", pack_mask_multiple},
 	{"trim", trim},
+	{"begins", begins_with},
+	{"begins_multiple", begins_with_multiple},
+	{"ends", ends_with},
+	{"ends_multiple", ends_with_multiple},
 	{"cookie", cookie},
 
 	{NULL, NULL}

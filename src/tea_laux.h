@@ -27,4 +27,17 @@ static inline const char *tea_tolstring(lua_State *l, int obj, size_t *len)
 	return str;
 }
 
+static inline const char *tea_checklstring(lua_State *l, int obj, size_t *len)
+{
+	const char *str = lua_tolstring(l, obj, len);
+
+	if (str) {
+		return str;
+	}
+
+	meta_tostring(l, obj);
+
+	return luaL_checklstring(l, obj, len);
+}
+
 #endif

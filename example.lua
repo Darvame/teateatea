@@ -2,7 +2,7 @@ local tea = require "teateatea";
 
 --[[
 	local tab = tea.pack(str, separator[, drop_empty, trim_value_whitespaces, multi_separators]);
-	local tab = tea.kvpack(str, equals, separator[, drop_empty, trim_key_whitespaces, trim_value_whitespaces, multi_equals, multi_separators, do_not_swap_empty]);
+	local tab = tea.kvpack(str, equals, separator[, drop_empty, trim_key_whitespaces, trim_value_whitespaces, multi_equals, multi_separators, swap_empty_key]);
 	local trimed_str = tea.trim(str);
 
 	where:
@@ -11,11 +11,11 @@ local tea = require "teateatea";
 	equals : "string" or (metatable.__tostring() result) - equals token
 
 	drop_empty : boolean - do NOT push empty values
-	trim_key_whitespaces : boolean (trim whitespaces from key before pushing
+	trim_key_whitespaces : boolean - trim whitespaces from key before pushing
 	trim_value_whitespaces : boolean - trim whitespaces from value before pushing
 	multi_separators : boolean - use the separator value as a collection of 1 byte separation tokens, UTF-8 (2 bytes and more) is unsupported
 	multi_equals : boolean - use the equals value as a collection of 1 byte equals tokens, UTF-8 (2 bytes and more) is unsupported
-	do_not_swap_empty : boolean - do NOT swap an empty key with the corresponding value
+	swap_empty_key : boolean - if a key is empty, swap the key with the corresponding value
 
 ]]
 
