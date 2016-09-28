@@ -10,14 +10,11 @@
 ```lua
     local table = teateatea.kvpack(str, equals, separator[, drop_empty, trim_key_whitespaces, trim_value_whitespaces, multi_equals, multi_separators, swap_empty_key]);
 ```
-- trim whitespaces
-```lua
-    local trimed_str = teateatea.trim(str);
-```
+- and etc
 
 ---
 
-<b>checkout [example.lua](./example.lua) for examples and more info </b>
+<b>checkout [example.lua](./example.lua) for examples and more info and stuff </b>
 
 ---
 

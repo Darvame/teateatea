@@ -5,7 +5,7 @@
 
 int tea_tcursor_add(struct tea_tcursor *cursor, const char *value, size_t vlen)
 {
-	if (cursor->size < TEA_TCURSOR_INITITAL) {
+	if (cursor->size < TEA_TCURSOR_INITIAL) {
 		cursor->value[cursor->size] = value;
 		cursor->vlen[cursor->size] = vlen;
 
@@ -48,7 +48,7 @@ void tea_tcursor_dump(lua_State *l, struct tea_tcursor *cursor)
 
 	size_t i, j, count;
 
-	for (count = 0, i = cursor->size > TEA_TCURSOR_INITITAL ? TEA_TCURSOR_INITITAL : cursor->size; i > 0; --i) {
+	for (count = 0, i = cursor->size > TEA_TCURSOR_INITIAL ? TEA_TCURSOR_INITIAL : cursor->size; i > 0; --i) {
 		lua_pushlstring(l, cursor->value[count], cursor->vlen[count]);
 		lua_rawseti(l, -2, ++count);
 	}
@@ -122,7 +122,7 @@ void tea_tcursor_kv_dump(lua_State *l, struct tea_tcursor_kv *cursor)
 
 	size_t i, j;
 
-	for (j = 0, i = cursor->size > TEA_TCURSOR_INITITAL ? TEA_TCURSOR_INITITAL : cursor->size; j < i; ++j) {
+	for (j = 0, i = cursor->size > TEA_TCURSOR_KV_INITIAL ? TEA_TCURSOR_KV_INITIAL : cursor->size; j < i; ++j) {
 		lua_pushlstring(l, cursor->key[j], cursor->klen[j]);
 		lua_pushlstring(l, cursor->value[j], cursor->vlen[j]);
 		lua_rawset(l, -3);

@@ -552,3 +552,15 @@ do
 	eql_kvtables(c, t);
 	eql_kvtables(n, {}); ok(); -- 73
 end
+
+crunning = "kvpack_10000";
+do
+	local c = tea.kvpack(("x=1;"):rep(1000), "=", ";");
+	ok(); -- 74
+end
+
+crunning = "pack_10000";
+do
+	local c = tea.pack(("1,"):rep(1000), ",");
+	ok(); -- 75
+end

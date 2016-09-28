@@ -6,7 +6,6 @@
 #include "string.h"
 
 #include "tea_tcursor.h"
-#include "tea_cookie.h"
 #include "tea_pack.h"
 #include "tea_trim.h"
 #include "tea_laux.h"
@@ -197,12 +196,6 @@ static int mask_pack(lua_State *l)
 	return 1;
 }
 
-static int cookie(lua_State *l)
-{
-
-	return tea_cookie(l, NULL, 0);
-}
-
 static int trim(lua_State *l)
 {
 	int argc = lua_gettop(l);
@@ -315,7 +308,6 @@ static const luaL_Reg api_list[] = {
 	{"begins_multiple", begins_with_multiple},
 	{"ends", ends_with},
 	{"ends_multiple", ends_with_multiple},
-	{"cookie", cookie},
 
 	{NULL, NULL}
 };

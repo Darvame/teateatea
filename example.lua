@@ -3,7 +3,6 @@ local tea = require "teateatea";
 --[[
 	local tab = tea.pack(str, separator[, drop_empty, trim_value_whitespaces, multi_separators]);
 	local tab = tea.kvpack(str, equals, separator[, drop_empty, trim_key_whitespaces, trim_value_whitespaces, multi_equals, multi_separators, swap_empty_key]);
-	local trimed_str = tea.trim(str);
 
 	where:
 	str : "string" or (metatable.__tostring() result) - target string
@@ -17,6 +16,38 @@ local tea = require "teateatea";
 	multi_equals : boolean - use the equals value as a collection of 1 byte equals tokens, UTF-8 (2 bytes and more) is unsupported
 	swap_empty_key : boolean - if a key is empty, swap the key with the corresponding value
 
+]]
+
+--[[ also about masks
+
+	getting a mask:
+		local mask = tea.mask.pack([drop_empty, trim_value_whitespaces, multi_separators]);
+		local kvmask = = tea.mask.kvpack([drop_empty, trim_key_whitespaces, trim_value_whitespaces, multi_equals, multi_separators, swap_empty_key]);
+
+	now using masks:
+		local tab = tea.pack_mask(str, separator[, mask]);
+		local tab = tea.kvpack_mask(str, equals, separator[, kvmask]);
+]]
+
+--[[ misc stuff
+
+	To trim whitespaces from the given strings:
+		local trimmed_str, trimmed_str2, trimmed_str3, ...  = tea.trim(str[, str2, str3, ...]);
+
+	To compare a begining or ending of the given string:
+		local str1_begins_with_str2 = tea.begins(str1, str2);
+		local str1_ends_with_str2 = tea.ends(str1, str2);
+]]
+
+--[[ and multiple values
+
+	pack and kvpack:
+		local tab1, tab2, ... = tea.pack_mask_multiple(mask, separator, str1[, str2, ...]);
+		local tab1, tab2, ... = tea.kvpack_mask_multiple(kvmask, equals, separator, str1[, str2, ...]);
+
+	begins ends:
+		local b1, b2, ... = tea.begins_multiple(begin_str, str1[, str2, ...]);
+		local e1, e2, ... = tea.ends_multiple(begin_str, str1[, str2, ...]);
 ]]
 
 -- *** basic:
@@ -73,6 +104,9 @@ local tab = tea.pack(str, "/", true); -- using the custom separator '/', setting
 local str = "one , two , three  , , foh  ";
 
 local tab = tea.pack(str, ",", false, true); -- 4rd arg is true -> to remove any whitespaces before a value insertion
+
+-- also same with using masks:
+local tab = tea.pack_mask(str, ",", tea.mask.pack(false, true));
 
 --[[
 	tab = {

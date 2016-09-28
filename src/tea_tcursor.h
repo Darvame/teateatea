@@ -4,7 +4,7 @@
 #include "lua.h"
 
 #define TEA_TCURSOR_WORKLOAD 128
-#define TEA_TCURSOR_INITITAL TEA_TCURSOR_WORKLOAD
+#define TEA_TCURSOR_INITIAL TEA_TCURSOR_WORKLOAD
 
 #define TEA_TCURSOR_KV_WORKLOAD 64
 #define TEA_TCURSOR_KV_INITIAL TEA_TCURSOR_KV_WORKLOAD
@@ -20,8 +20,8 @@ struct tea_tcursor_part {
 struct tea_tcursor {
 	size_t size;
 	size_t parts;
-	size_t vlen[TEA_TCURSOR_INITITAL];
-	const char *value[TEA_TCURSOR_INITITAL];
+	size_t vlen[TEA_TCURSOR_INITIAL];
+	const char *value[TEA_TCURSOR_INITIAL];
 	struct tea_tcursor_part *first;
 	struct tea_tcursor_part *current;
 };
